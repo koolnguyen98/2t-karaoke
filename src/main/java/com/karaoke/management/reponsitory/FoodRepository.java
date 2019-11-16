@@ -5,12 +5,12 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.karaoke.management.entity.Menu;
+import com.karaoke.management.entity.Food;
 
 @Repository("menuRepository")
-public interface MenuRepository extends JpaRepository<Menu, Integer> {
-	Menu findByMenuId(int menuId);
-	Menu findByEatingName(String menuName);
-	List<Menu> findByPrice(int price);
+public interface FoodRepository extends JpaRepository<Food, Integer> {
+	Food findByFoodId(int menuId);
+	Food findByEatingName(String menuName);
+	List<Food> findByPrice(int price);
 	boolean existsByEatingName(String eatingName);
 }

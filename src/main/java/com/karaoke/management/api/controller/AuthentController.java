@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.karaoke.management.Urls;
 import com.karaoke.management.api.request.LoginRequest;
 import com.karaoke.management.api.request.SignUpRequest;
 import com.karaoke.management.api.security.JwtTokenProvider;
@@ -31,12 +32,12 @@ public class AuthentController {
     @Autowired
     JwtTokenProvider tokenProvider;
     
-    @PostMapping(value={"api/checksigin"})
+    @PostMapping(value= Urls.API_AUTHENTICATION_SIGNIN)
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         return userAccountService.userSigin(loginRequest);
     }
     
-	@PostMapping(value={"api/signup"})
+	@PostMapping(value=Urls.API_AUTHENTICATION_SIGUP)
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         return userAccountService.userSigup(signUpRequest);
     }

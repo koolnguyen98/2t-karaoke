@@ -13,29 +13,29 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "chitiethoadon")
+@Table(name = "bill_details")
 public class BillDetails {
 	
 	@EmbeddedId
 	BillDetailsKey billDetailsId;
 	
 	@ManyToOne(targetEntity=Bill.class, fetch = FetchType.LAZY)
-    @MapsId("mahoadon")
-	@JoinColumn(name = "mahoadon")
+    @MapsId("bill_id")
+	@JoinColumn(name = "bill_id")
     private Bill bill;
  
-    @ManyToOne(targetEntity=Menu.class, fetch = FetchType.LAZY)
-    @MapsId("mathucdon")
-    @JoinColumn(name = "mathucdon")
-    private Menu menu;
+    @ManyToOne(targetEntity=Food.class, fetch = FetchType.LAZY)
+    @MapsId("food_id")
+    @JoinColumn(name = "food_id")
+    private Food food;
 	
 	@NotNull
-	@Column(name = "soluong", nullable = false)
-	int number;
+	@Column(name = "number", nullable = false)
+	private int number;
 	
 	@NotNull
-	@Column(name = "dongia", nullable = false)
-	double unitPrice;
+	@Column(name = "unit_price", nullable = false)
+	private double unitPrice;
 
 	public BillDetails(BillDetailsKey billDetailsId, @NotNull int number, @NotNull double unitPrice) {
 		super();
@@ -71,12 +71,12 @@ public class BillDetails {
 	}
 	
 	@JsonIgnore
-	public Menu getMenu() {
-		return menu;
+	public Food getFood() {
+		return food;
 	}
 
-	public void setMenu(Menu menu) {
-		this.menu = menu;
+	public void setFood(Food food) {
+		this.food = food;
 	}
 
 	public int getNumber() {

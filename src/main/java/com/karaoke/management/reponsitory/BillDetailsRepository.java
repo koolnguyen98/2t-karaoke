@@ -8,13 +8,13 @@ import org.springframework.stereotype.Repository;
 import com.karaoke.management.entity.Bill;
 import com.karaoke.management.entity.BillDetails;
 import com.karaoke.management.entity.BillDetailsKey;
-import com.karaoke.management.entity.Menu;
+import com.karaoke.management.entity.Food;
 
 @Repository("billDetailsRepository")
 public interface BillDetailsRepository extends JpaRepository<BillDetails, BillDetailsKey> {
 	List<BillDetails> findByBill(Bill bill);
-	List<BillDetails> findByMenu(Menu menu);
+	List<BillDetails> findByFood(Food food);
 	//BillDetails findByBillDetail(BillDetailsKey billDetailsId);
-	boolean existsByMenu(Menu menu);
-	BillDetails findByBillAndMenu(Bill bill, Menu menu);	
+	boolean existsByFood(Food food);
+	BillDetails findByBillAndFood(Bill bill, Food food);	
 }

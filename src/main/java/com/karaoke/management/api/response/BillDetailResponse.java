@@ -2,13 +2,13 @@ package com.karaoke.management.api.response;
 
 public class BillDetailResponse {
 
-	MenuResponse menuResponse;
+	FoodResponse foodResponse;
 	int number;
 	double unitPrice;
 	
-	public BillDetailResponse(MenuResponse menuResponse, int number, double unitPrice) {
+	public BillDetailResponse(FoodResponse foodResponse, int number, double unitPrice) {
 		super();
-		this.menuResponse = menuResponse;
+		this.foodResponse = foodResponse;
 		this.number = number;
 		this.unitPrice = unitPrice;
 	}
@@ -17,12 +17,12 @@ public class BillDetailResponse {
 		super();
 	}
 
-	public MenuResponse getMenuResponse() {
-		return menuResponse;
+	public FoodResponse getFoodResponse() {
+		return foodResponse;
 	}
 
-	public void setMenuResponse(MenuResponse menuResponse) {
-		this.menuResponse = menuResponse;
+	public void setFoodResponse(FoodResponse foodResponse) {
+		this.foodResponse = foodResponse;
 	}
 
 	public int getNumber() {

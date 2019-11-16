@@ -22,17 +22,17 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "hoadon")
+@Table(name = "bill")
 public class Bill {
 
 	@Id
     @GeneratedValue
-    @Column(name = "mahoadon")
+    @Column(name = "id")
 	int billId;
 	
 	@NotNull
 	@ManyToOne(targetEntity=Room.class)
-    @JoinColumn(name="maphong", referencedColumnName = "maphong", nullable = false) 
+    @JoinColumn(name="room_id", nullable = false) 
 	Room room;
 	
 	@NotNull
@@ -46,18 +46,18 @@ public class Bill {
 	@Column(name = "checkout", nullable = false)
 	LocalDateTime  checkout;
 	
-	@Column(name = "tongtien", nullable = false)
+	@Column(name = "total", nullable = false)
 	double total;
 	
-	@Column(name = "chitiet", nullable = false)
+	@Column(name = "detail", nullable = false)
 	String details;
 	
 	@OneToMany(targetEntity=BillDetails.class, mappedBy = "bill", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Menu> menus = new ArrayList<Menu>();
+	private List<Food> menus = new ArrayList<Food>();
 	
 	@NotNull
 	@ManyToOne(targetEntity=UserAccount.class)
-    @JoinColumn(name="thungan", referencedColumnName = "id", nullable = false) 
+    @JoinColumn(name="cashier", referencedColumnName = "id", nullable = false) 
 	UserAccount userAccount;
 	
 	
@@ -154,15 +154,15 @@ public class Bill {
 		this.userAccount = userAccount;
 	}
 
-	public List<Menu> getMenus() {
+	public List<Food> getMenus() {
 		return menus;
 	}
 
-	public void setMenus(List<Menu> menus) {
+	public void setMenus(List<Food> menus) {
 		this.menus = menus;
 	}
 	
-	public void addMenu(Menu menu) {
+	public void addMenu(Food menu) {
 		this.menus.add(menu);
 	}
 	

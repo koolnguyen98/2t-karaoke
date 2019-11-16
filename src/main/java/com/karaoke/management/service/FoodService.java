@@ -12,34 +12,34 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.karaoke.management.api.request.MenuRequest;
+import com.karaoke.management.api.request.FoodRequest;
 import com.karaoke.management.api.response.ApiResponse;
-import com.karaoke.management.api.response.MenuResponse;
+import com.karaoke.management.api.response.FoodResponse;
 import com.karaoke.management.api.response.MessageResponse;
-import com.karaoke.management.entity.Menu;
+import com.karaoke.management.entity.Food;
 import com.karaoke.management.reponsitory.BillDetailsRepository;
-import com.karaoke.management.reponsitory.MenuRepository;
+import com.karaoke.management.reponsitory.FoodRepository;
 
 @Service
-public class MenuService {
+public class FoodService {
 
 	@Autowired
-	MenuRepository menuRepository;
+	FoodRepository foodRepository;
 
 	@Autowired
 	BillDetailsRepository billDetailsRepository;
 
 	public ResponseEntity<?> findAll() {
 		try {
-			List<Menu> listMenu = menuRepository.findAll();
-			List<MenuResponse> listMenuResponses = new ArrayList<MenuResponse>();
-			for (Menu menu : listMenu) {
-				MenuResponse menuResponse = new MenuResponse(menu.getMenuId(), menu.getEatingName(), menu.getUnit(),
-						menu.getPrice());
-				listMenuResponses.add(menuResponse);
+			List<Food> listfood = foodRepository.findAll();
+			List<FoodResponse> listfoodResponses = new ArrayList<FoodResponse>();
+			for (Food food : listfood) {
+				FoodResponse foodResponse = new FoodResponse(food.getFoodId(), food.getEatingName(), food.getUnit(),
+						food.getPrice());
+				listfoodResponses.add(foodResponse);
 			}
 
-			return ResponseEntity.ok(listMenuResponses);
+			return ResponseEntity.ok(listfoodResponses);
 
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
@@ -48,12 +48,12 @@ public class MenuService {
 
 	public ResponseEntity<?> findById(int id) {
 		try {
-			Menu menu = menuRepository.findByMenuId(id);
-	    	if (menu == null) {
+			Food food = foodRepository.findByFoodId(id);
+	    	if (food == null) {
 	    		return new ResponseEntity<Object>(new ApiResponse(false, "Dishes doesn't exist!"), HttpStatus.NOT_FOUND);
 	        } else {
-		    	MenuResponse menuResponse = new MenuResponse(menu.getMenuId(), menu.getEatingName(), menu.getUnit(), menu.getPrice());
-		    	return ResponseEntity.ok(menuResponse);
+		    	FoodResponse foodResponse = new FoodResponse(food.getFoodId(), food.getEatingName(), food.getUnit(), food.getPrice());
+		    	return ResponseEntity.ok(foodResponse);
 	        }
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
@@ -61,32 +61,32 @@ public class MenuService {
 
 	}
 	
-	public ResponseEntity<?> updateById(int id, MenuRequest menuRequest) {
+	public ResponseEntity<?> updateById(int id, FoodRequest foodRequest) {
 		try {
-			Menu menu = menuRepository.findByMenuId(id);
-	        if (menu == null) {
+			Food food = foodRepository.findByFoodId(id);
+	        if (food == null) {
 	        	return new ResponseEntity<Object>(new ApiResponse(false, "Dishes doesn't exist!"), HttpStatus.NOT_FOUND);
 	        } else {
-	        	if(menuRepository.existsByEatingName(menuRequest.getEatingName()) || menuRequest.getEatingName() == "" || menuRequest.getEatingName() == null) {
+	        	if(foodRepository.existsByEatingName(foodRequest.getEatingName()) || foodRequest.getEatingName() == "" || foodRequest.getEatingName() == null) {
 		            return new ResponseEntity<Object>(new ApiResponse(false, "Eating name is already taken!"),
 		                    HttpStatus.BAD_REQUEST);
 		        }
 		    	
-		    	if(menuRequest.getUnit() == "" || menuRequest.getUnit() == null) {
+		    	if(foodRequest.getUnit() == "" || foodRequest.getUnit() == null) {
 		            return new ResponseEntity<Object>(new ApiResponse(false, "Unit not null!"),
 		                    HttpStatus.BAD_REQUEST);
 		        }
 		    	
-		    	if(menuRequest.getPrice() < 0 || menuRequest.getPrice() == 0) {
+		    	if(foodRequest.getPrice() < 0 || foodRequest.getPrice() == 0) {
 		            return new ResponseEntity<Object>(new ApiResponse(false, "Price > 0!"),
 		                    HttpStatus.BAD_REQUEST);
 		        }
-		    	Menu updatedMenu = updateMenuById(menu, menuRequest);
-	        	MenuResponse menuResponse = new MenuResponse(updatedMenu.getMenuId(), 
-	        			updatedMenu.getEatingName(), 
-	        			updatedMenu.getUnit(), 
-	        			updatedMenu.getPrice());
-	            return ResponseEntity.ok(menuResponse);
+		    	Food updatedfood = updateFoodById(food, foodRequest);
+	        	FoodResponse foodResponse = new FoodResponse(updatedfood.getFoodId(), 
+	        			updatedfood.getEatingName(), 
+	        			updatedfood.getUnit(), 
+	        			updatedfood.getPrice());
+	            return ResponseEntity.ok(foodResponse);
 	        }
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
@@ -95,14 +95,14 @@ public class MenuService {
 	
 	public ResponseEntity<?> deleteById(int id) {
 		try {
-			boolean deleteMenu = deleteMenuById(id);
+			boolean deletefood = deleteFoodById(id);
 	    	MessageResponse messageResponse = null;
-	    	if (!deleteMenu) {
+	    	if (!deletefood) {
 	    		messageResponse = new MessageResponse("Dishes doesn't exist!", 404);
 	    		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponse);
 			}
 	    	
-	    	messageResponse = new MessageResponse("Delete Menu Access", 200);
+	    	messageResponse = new MessageResponse("Delete food Access", 200);
 			return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
@@ -110,39 +110,39 @@ public class MenuService {
 
 	}
 	
-	public ResponseEntity<?> create(MenuRequest menuRequest) {
+	public ResponseEntity<?> create(FoodRequest foodRequest) {
 		try {
-			if(menuRepository.existsByEatingName(menuRequest.getEatingName()) || menuRequest.getEatingName() == "" || menuRequest.getEatingName() == null) {
+			if(foodRepository.existsByEatingName(foodRequest.getEatingName())) {
 	            return new ResponseEntity<Object>(new ApiResponse(false, "Eating name is already taken!"),
 	                    HttpStatus.BAD_REQUEST);
 	        }
 	    	
-	    	if(menuRequest.getUnit() == "" || menuRequest.getUnit() == null) {
+	    	if(foodRequest.getUnit() == "" || foodRequest.getUnit() == null) {
 	            return new ResponseEntity<Object>(new ApiResponse(false, "Unit not null!"),
 	                    HttpStatus.BAD_REQUEST);
 	        }
 	    	
-	    	if(menuRequest.getPrice() < 0 || menuRequest.getPrice() == 0) {
+	    	if(foodRequest.getPrice() < 0 || foodRequest.getPrice() == 0) {
 	            return new ResponseEntity<Object>(new ApiResponse(false, "Price > 0!"),
 	                    HttpStatus.BAD_REQUEST);
 	        }
 	    	
-	        Menu createdMenu = createRoom(menuRequest);
-	        if (createdMenu == null) {
+	        Food createdfood = createFood(foodRequest);
+	        if (createdfood == null) {
 	        	return new ResponseEntity<Object>(new ApiResponse(false, "Cann't creat dishes!"), HttpStatus.NOT_FOUND);
 	        } else {
 	            URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
 	              .path("/{id}")
-	              .buildAndExpand(createdMenu.getMenuId())
+	              .buildAndExpand(createdfood.getFoodId())
 	              .toUri();
-	            MenuResponse menuResponse = new MenuResponse(createdMenu.getMenuId(), 
-	            		createdMenu.getEatingName(), 
-	            		createdMenu.getUnit(), 
-	            		createdMenu.getPrice());
+	            FoodResponse foodResponse = new FoodResponse(createdfood.getFoodId(), 
+	            		createdfood.getEatingName(), 
+	            		createdfood.getUnit(), 
+	            		createdfood.getPrice());
 	            ResponseEntity.created(uri)
-	              .body(menuResponse);
+	              .body(foodResponse);
 				return ResponseEntity.created(uri)
-			              .body(menuResponse);
+			              .body(foodResponse);
 	        }
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
@@ -150,26 +150,26 @@ public class MenuService {
 
 	}
 
-	private Menu createRoom(@Valid MenuRequest menuRequest) {
-		Menu menu = menuRepository.findByEatingName(menuRequest.getEatingName());
-		if (menu == null) {
+	private Food createFood(@Valid FoodRequest foodRequest) {
+		Food food = foodRepository.findByEatingName(foodRequest.getEatingName());
+		if (food == null) {
 
-			Menu createdMenu = new Menu(menuRequest.getEatingName(), menuRequest.getUnit(), menuRequest.getPrice());
-			Menu result = menuRepository.save(createdMenu);
+			Food createdfood = new Food(foodRequest.getEatingName(), foodRequest.getUnit(), foodRequest.getPrice());
+			Food result = foodRepository.save(createdfood);
 
 			return result;
 		}
 		return null;
 	}
 
-	private boolean deleteMenuById(int id) {
-		Menu menu = menuRepository.findByMenuId(id);
+	private boolean deleteFoodById(int id) {
+		Food food = foodRepository.findByFoodId(id);
 
-		if (menu != null) {
-			boolean checkExitBillDetail = billDetailsRepository.existsByMenu(menu);
+		if (food != null) {
+			boolean checkExitBillDetail = billDetailsRepository.existsByFood(food);
 
 			if (!checkExitBillDetail) {
-				menuRepository.delete(menu);
+				foodRepository.delete(food);
 				return !checkExitBillDetail;
 			}
 
@@ -180,18 +180,18 @@ public class MenuService {
 		return false;
 	}
 
-	private Menu updateMenuById(Menu menu, MenuRequest menuRequest) {
+	private Food updateFoodById(Food food, FoodRequest foodRequest) {
 		
-		if (menuRequest.getEatingName() != null && menuRequest.getEatingName() != "") {
-			menu.setEatingName(menuRequest.getEatingName());
+		if (foodRequest.getEatingName() != null && foodRequest.getEatingName() != "") {
+			food.setEatingName(foodRequest.getEatingName());
 		}
-		if (menuRequest.getUnit() != null && menuRequest.getUnit() != "") {
-			menu.setUnit(menuRequest.getUnit());
+		if (foodRequest.getUnit() != null && foodRequest.getUnit() != "") {
+			food.setUnit(foodRequest.getUnit());
 		}
-		if (menuRequest.getPrice() != -1) {
-			menu.setPrice(menuRequest.getPrice());
+		if (foodRequest.getPrice() != -1) {
+			food.setPrice(foodRequest.getPrice());
 		}
-		Menu result = menuRepository.save(menu);
+		Food result = foodRepository.save(food);
 
 		return result;
 	}

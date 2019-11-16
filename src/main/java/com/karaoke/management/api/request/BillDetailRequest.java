@@ -3,13 +3,13 @@ package com.karaoke.management.api.request;
 public class BillDetailRequest {
 	
 	int billId;
-	int menuId;
+	int foodId;
 	int number;
 	
-	public BillDetailRequest(int billId, int menuId, int number, double unitPrice) {
+	public BillDetailRequest(int billId, int foodId, int number, double unitPrice) {
 		super();
 		this.billId = billId;
-		this.menuId = menuId;
+		this.foodId = foodId;
 		this.number = number;
 	}
 
@@ -25,12 +25,12 @@ public class BillDetailRequest {
 		this.billId = billId;
 	}
 
-	public int getMenuId() {
-		return menuId;
+	public int getFoodId() {
+		return foodId;
 	}
 
-	public void setMenuId(int menuId) {
-		this.menuId = menuId;
+	public void setFoodId(int foodId) {
+		this.foodId = foodId;
 	}
 
 	public int getNumber() {

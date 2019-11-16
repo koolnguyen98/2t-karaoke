@@ -81,7 +81,7 @@ public class RoomService {
 						HttpStatus.BAD_REQUEST);
 			}
 
-			if (checkRoomRequest(roomRequest.getRoomTypeId())) {
+			if (!checkRoomRequest(roomRequest.getRoomTypeId())) {
 				return new ResponseEntity<Object>(new ApiResponse(false, "Room Type no exist!"),
 						HttpStatus.BAD_REQUEST);
 			}

@@ -19,26 +19,26 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "phong")
+@Table(name = "room")
 public class Room {
 	
 	@Id
     @GeneratedValue
-    @Column(name = "maphong")
+    @Column(name = "id")
 	int roomId;
 	
 	@NotNull
 	@Size(max = 20)
-	@Column(name = "tenphong", nullable = false)
+	@Column(name = "room_name", nullable = false)
 	String roomName;
 	
 	@NotNull
 	@ManyToOne()
-    @JoinColumn(name="maloai", nullable = false) 
+    @JoinColumn(name="type_id", nullable = false) 
 	private RoomType roomType;
 	
 	@NotNull
-	@Column(name = "trangthai", nullable = false)
+	@Column(name = "status", nullable = false)
 	int  status;
 	
 	@OneToMany(targetEntity=Bill.class, mappedBy="room",cascade=CascadeType.ALL, fetch = FetchType.LAZY)    

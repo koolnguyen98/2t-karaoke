@@ -8,16 +8,16 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class BillDetailsKey implements Serializable {
 
-	@Column(name = "mahoadon")
-	int billId;
+	@Column(name = "bill_id")
+	private int billId;
 
-	@Column(name = "mathucdon")
-	int menuId;
+	@Column(name = "food_id")
+	private int foodId;
 
-	public BillDetailsKey(int billId, int menuId) {
+	public BillDetailsKey(int billId, int foodId) {
 		super();
 		this.billId = billId;
-		this.menuId = menuId;
+		this.foodId = foodId;
 	}
 
 	public BillDetailsKey() {
@@ -32,12 +32,12 @@ public class BillDetailsKey implements Serializable {
 		this.billId = billId;
 	}
 
-	public int getMenuId() {
-		return menuId;
+	public int getFoodId() {
+		return foodId;
 	}
 
-	public void setMenuId(int menuId) {
-		this.menuId = menuId;
+	public void setFoodId(int foodId) {
+		this.foodId = foodId;
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class BillDetailsKey implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + billId;
-		result = prime * result + menuId;
+		result = prime * result + foodId;
 		return result;
 	}
 
@@ -60,7 +60,7 @@ public class BillDetailsKey implements Serializable {
 		BillDetailsKey other = (BillDetailsKey) obj;
 		if (billId != other.billId)
 			return false;
-		if (menuId != other.menuId)
+		if (foodId != other.foodId)
 			return false;
 		return true;
 	}

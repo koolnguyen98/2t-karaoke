@@ -12,7 +12,6 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Intege
 	UserAccount findById(int id);
 	UserAccount findByUserName(String username);
 	List<UserAccount> findByName(String name);
-	List<UserAccount> findByRoleLevel(int roleLevel);
 	boolean existsByUserName(String username);
 	
 }

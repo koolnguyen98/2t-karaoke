@@ -12,4 +12,5 @@ public interface RoomTypeRepository extends JpaRepository<RoomType, Integer> {
 	RoomType findByTypeId(int roomTypeId);
 	RoomType findByTypeName(String roomName);
 	List<RoomType> findByPrice(int price);
+	boolean existsByTypeName(String typeName);
 }

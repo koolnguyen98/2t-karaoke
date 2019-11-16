@@ -1,6 +1,6 @@
 package com.karaoke.management.api.request;
 
-public class MenuRequest {
+public class FoodRequest {
 
 	String eatingName;
 	
@@ -8,14 +8,14 @@ public class MenuRequest {
 	
 	double price = -1;
 
-	public MenuRequest(String eatingName, String unit, double price) {
+	public FoodRequest(String eatingName, String unit, double price) {
 		super();
 		this.eatingName = eatingName;
 		this.unit = unit;
 		this.price = price;
 	}
 
-	public MenuRequest() {
+	public FoodRequest() {
 		super();
 	}
 

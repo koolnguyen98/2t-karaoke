@@ -15,9 +15,6 @@ public class SignUpRequest {
     @NotBlank
     @Size(max = 100)
     private String name;
-    
-    @NotNull
-    private int level;
 
     public String getName() {
         return name;
@@ -33,14 +30,6 @@ public class SignUpRequest {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public int getLevel() {
-        return this.level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
     }
 
     public String getPassword() {

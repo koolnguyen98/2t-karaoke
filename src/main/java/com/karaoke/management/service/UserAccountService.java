@@ -20,7 +20,6 @@ import com.karaoke.management.api.response.JwtAuthenticationResponse;
 import com.karaoke.management.api.security.JwtTokenProvider;
 import com.karaoke.management.api.security.UserDetailsImp;
 import com.karaoke.management.entity.UserAccount;
-import com.karaoke.management.reponsitory.RoleRepository;
 import com.karaoke.management.reponsitory.UserAccountRepository;
 
 @Service
@@ -33,9 +32,6 @@ public class UserAccountService {
     UserAccountRepository userAccountRepository;
 
     @Autowired
-    RoleRepository roleRepository;
-
-    @Autowired
     PasswordEncoder passwordEncoder;
     
     @Autowired
@@ -45,8 +41,7 @@ public class UserAccountService {
     	// Creating user's account
         UserAccount userAccount = new UserAccount(signUpRequest.getUsername(), 
         		signUpRequest.getPassword(), 
-        		signUpRequest.getName(), 
-        		roleRepository.findByLevel(signUpRequest.getLevel()));
+        		signUpRequest.getName());
 
         userAccount.setPassword(passwordEncoder.encode(userAccount.getPassword()));
 

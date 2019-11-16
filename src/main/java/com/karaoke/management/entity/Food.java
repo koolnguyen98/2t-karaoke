@@ -14,48 +14,48 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "thucdon")
-public class Menu {
+@Table(name = "food")
+public class Food {
 
 	@Id
 	@GeneratedValue
-	@Column(name = "mathucdon")
-	int menuId;
+	@Column(name = "id")
+	int foodId;
 
 	@NotNull
 	@Size(max = 65)
-	@Column(name = "tenmonan", nullable = false)
+	@Column(name = "food_name", nullable = false)
 	String eatingName;
 
 	@NotNull
 	@Size(max = 20)
-	@Column(name = "donvitinh", nullable = false)
+	@Column(name = "unit", nullable = false)
 	String unit;
 
 	@NotNull
-	@Column(name = "giatien", nullable = false)
+	@Column(name = "price", nullable = false)
 	double price;
 
-	@OneToMany(targetEntity=BillDetails.class, mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(targetEntity=BillDetails.class, mappedBy = "food", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Bill> bills = new ArrayList<Bill>();
 
-	public Menu(@NotNull String eatingName, @NotNull String unit, @NotNull double price) {
+	public Food(@NotNull String eatingName, @NotNull String unit, @NotNull double price) {
 		super();
 		this.eatingName = eatingName;
 		this.unit = unit;
 		this.price = price;
 	}
 
-	public Menu() {
+	public Food() {
 		super();
 	}
 
-	public int getMenuId() {
-		return menuId;
+	public int getFoodId() {
+		return foodId;
 	}
 
-	public void setMenuId(int menuId) {
-		this.menuId = menuId;
+	public void setFoodId(int foodId) {
+		this.foodId = foodId;
 	}
 
 	public String getEatingName() {

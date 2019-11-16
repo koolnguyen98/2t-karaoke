@@ -43,22 +43,8 @@ public class UserAccount {
 	@Column(name = "name", nullable = false)
 	private String name;
 	
-	@NotNull
-	@ManyToOne(targetEntity=Role.class)
-    @JoinColumn(name="level", nullable=false) 
-	private Role roleLevel;
-	
 	@OneToMany(targetEntity=Bill.class, mappedBy="userAccount",cascade=CascadeType.ALL, fetch = FetchType.LAZY)    
 	private List<Bill> bills = new ArrayList<Bill>();
-	
-	public UserAccount(@NotNull String userName, @NotNull String password, @NotNull String name,
-			@NotNull Role roleLevel) {
-		super();
-		this.userName = userName;
-		this.password = password;
-		this.name = name;
-		this.roleLevel = roleLevel;
-	}
 	
 	public UserAccount(@NotNull String userName, @NotNull String password, @NotNull String name) {
 		super();
@@ -101,15 +87,6 @@ public class UserAccount {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-	
-	@JsonIgnore
-	public Role getRoleLevel() {
-		return roleLevel;
-	}
-
-	public void setRoleLevel(Role roleLevel) {
-		this.roleLevel = roleLevel;
 	}
 
 	public List<Bill> getBills() {

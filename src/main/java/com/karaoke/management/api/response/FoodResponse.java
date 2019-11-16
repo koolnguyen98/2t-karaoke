@@ -1,6 +1,6 @@
 package com.karaoke.management.api.response;
 
-public class MenuResponse {
+public class FoodResponse {
 	
 	int menuId;
 	
@@ -10,11 +10,11 @@ public class MenuResponse {
 	
 	double price;
 	
-	public MenuResponse() {
+	public FoodResponse() {
 		super();
 	}
 
-	public MenuResponse(int menuId, String eatingName, String unit, double price) {
+	public FoodResponse(int menuId, String eatingName, String unit, double price) {
 		super();
 		this.menuId = menuId;
 		this.eatingName = eatingName;

@@ -1,5 +1,5 @@
 package com.karaoke.management.api.controller;
 
-public class BillManagementController {
+public class ReportManagementController {
 
 }

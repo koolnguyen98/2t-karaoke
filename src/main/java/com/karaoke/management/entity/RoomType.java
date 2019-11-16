@@ -15,21 +15,21 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "loaiphong")
+@Table(name = "room_type")
 public class RoomType {
 	
 	@Id
     @GeneratedValue
-    @Column(name = "maloai")
+    @Column(name = "id")
 	int typeId;
 	
 	@NotNull
 	@Size(max = 65)
-	@Column(name = "tenloai", nullable = false)
+	@Column(name = "type_name", nullable = false)
 	String typeName;
 	
 	@NotNull
-	@Column(name = "giatien", nullable = false)
+	@Column(name = "price", nullable = false)
 	int price;
 	
 	@OneToMany(mappedBy="roomType",cascade=CascadeType.ALL, fetch = FetchType.LAZY)    

@@ -1,6 +1,7 @@
 package com.karaoke.management.service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,7 @@ import com.karaoke.management.api.request.BillDetailRequest;
 import com.karaoke.management.api.response.ApiResponse;
 import com.karaoke.management.api.response.BillDetailResponse;
 import com.karaoke.management.api.response.BillResponse;
-import com.karaoke.management.api.response.MenuResponse;
+import com.karaoke.management.api.response.FoodResponse;
 import com.karaoke.management.api.response.MessageResponse;
 import com.karaoke.management.api.response.OrderResponse;
 import com.karaoke.management.api.response.RoomResponse;
@@ -25,12 +26,12 @@ import com.karaoke.management.api.response.RoomTypeResponse;
 import com.karaoke.management.entity.Bill;
 import com.karaoke.management.entity.BillDetails;
 import com.karaoke.management.entity.BillDetailsKey;
-import com.karaoke.management.entity.Menu;
+import com.karaoke.management.entity.Food;
 import com.karaoke.management.entity.Room;
 import com.karaoke.management.entity.UserAccount;
 import com.karaoke.management.reponsitory.BillDetailsRepository;
 import com.karaoke.management.reponsitory.BillRepository;
-import com.karaoke.management.reponsitory.MenuRepository;
+import com.karaoke.management.reponsitory.FoodRepository;
 import com.karaoke.management.reponsitory.RoomRepository;
 import com.karaoke.management.reponsitory.UserAccountRepository;
 
@@ -44,7 +45,7 @@ public class OrderService {
 	BillRepository billRepository;
 
 	@Autowired
-	MenuRepository menuRepository;
+	FoodRepository foodRepository;
 
 	@Autowired
 	BillDetailsRepository billDetailsRepository;
@@ -167,13 +168,13 @@ public class OrderService {
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	private boolean deleteBillDetail(@Valid BillDetailRequest billDetailRequest) {
 		Bill bill = billRepository.findByBillId(billDetailRequest.getBillId());
-		Menu menu = menuRepository.findByMenuId(billDetailRequest.getMenuId());
-		if (checkBillAndMenuExist(bill, menu)) {
+		Food food = foodRepository.findByFoodId(billDetailRequest.getFoodId());
+		if (checkBillAndFoodExist(bill, food)) {
 			try {
-				BillDetails billDetails = billDetailsRepository.findByBillAndMenu(bill, menu);
+				BillDetails billDetails = billDetailsRepository.findByBillAndFood(bill, food);
 				billDetailsRepository.delete(billDetails);
 				updateTotalPrice(bill);
 			} catch (Exception e) {
@@ -185,9 +186,9 @@ public class OrderService {
 		}
 	}
 
-	private boolean checkBillAndMenuExist(Bill bill, Menu menu) {
+	private boolean checkBillAndFoodExist(Bill bill, Food food) {
 
-		if (bill == null || menu == null) {
+		if (bill == null || food == null) {
 			return false;
 		}
 		return true;
@@ -211,13 +212,11 @@ public class OrderService {
 	private OrderResponse createOrderWhenCheckOut(int roomId, String username) {
 		OrderResponse orderResponse = new OrderResponse();
 		Room room = updateCheckout(roomId);
-		RoomResponse roomResponse = setRoomResponse(room);
-		orderResponse.setRoom(roomResponse);
 
 		Bill bill = updateBill(roomId, username);
-		BillResponse billResponse = new BillResponse(bill.getBillId(), bill.getRoom().getRoomId(), bill.getCheckin(),
-				bill.getChecout(), bill.getTotal(), bill.getUserAccount().getId());
-		orderResponse.setBill(billResponse);
+		bill  = calculateTotal(bill);
+		List<BillDetails> listBillDetails = billDetailsRepository.findByBill(bill);
+		orderResponse = createOrderReponse(room, bill, listBillDetails);
 
 		return orderResponse;
 	}
@@ -246,6 +245,8 @@ public class OrderService {
 
 		room.setStatus(0);
 
+		room = roomRepository.save(room);
+
 		return room;
 	}
 
@@ -266,26 +267,49 @@ public class OrderService {
 		bill.setUserAccoutId(userAccount);
 		bill.setCheckout(checkout);
 
-		double total = calculateTotal(bill);
-		bill.setTotal(total);
+		bill = billRepository.save(bill);
 
 		return bill;
 	}
 
-	private double calculateTotal(Bill bill) {
+	private Bill calculateTotal(Bill bill) {
 		double total = 0;
-		total = calculateTimeMoney(bill.getCheckin(), bill.getChecout());
+		total = calculateTimeMoney(bill.getCheckin(), bill.getChecout(),
+				(double) bill.getRoom().getRoomType().getPrice());
 
-		List<BillDetails> billDetails = billDetailsRepository.findByBill(bill);
-		for (BillDetails billDetail : billDetails) {
-			total += (billDetail.getUnitPrice() * (double) billDetail.getNumber());
-		}
-		return total;
+		bill = updateTotalPrice(bill);
+		
+		bill.setTotal(total + bill.getTotal());
+		
+		bill = billRepository.save(bill);
+		return bill;
 	}
 
-	private double calculateTimeMoney(LocalDateTime checkin, LocalDateTime checout) {
-		// System.out.println(checkin. (checout));
-		return 0;
+	private double calculateTimeMoney(LocalDateTime checkinTime, LocalDateTime checkoutTime, double priceRoom) {
+
+			double result = 0;
+
+			LocalDateTime tempDateTime = LocalDateTime.from(checkinTime);
+
+			long hours = tempDateTime.until(checkoutTime, ChronoUnit.HOURS);
+			tempDateTime = tempDateTime.plusHours(hours);
+
+			result += hours;
+
+			long minutes = tempDateTime.until(checkoutTime, ChronoUnit.MINUTES);
+			tempDateTime = tempDateTime.plusMinutes(minutes);
+
+			result += (double) minutes / 60;
+
+			long seconds = tempDateTime.until(checkoutTime, ChronoUnit.SECONDS);
+
+			result += (double) seconds / 3600;
+
+			result = Math.round(result * 100.0) / 100.0;
+
+			result = (double) result * priceRoom;
+
+			return result;
 	}
 
 	private OrderResponse createOrderReponse(Room room, Bill bill, List<BillDetails> listBillDetails) {
@@ -300,13 +324,13 @@ public class OrderService {
 		List<BillDetailResponse> listBillDetailResponse = new ArrayList<BillDetailResponse>();
 
 		for (BillDetails billDetails : listBillDetails) {
-			Menu menu = billDetails.getMenu();
-			MenuResponse menuResponse = new MenuResponse(menu.getMenuId(), menu.getEatingName(), menu.getUnit(),
-					menu.getPrice());
+			Food food = billDetails.getFood();
+			FoodResponse foodResponse = new FoodResponse(food.getFoodId(), food.getEatingName(), food.getUnit(),
+					food.getPrice());
 
 			BillDetailResponse billDetailResponse = new BillDetailResponse();
 			if (billDetails != null) {
-				billDetailResponse.setMenuResponse(menuResponse);
+				billDetailResponse.setFoodResponse(foodResponse);
 				billDetailResponse.setNumber(billDetails.getNumber());
 				billDetailResponse.setUnitPrice(billDetails.getUnitPrice());
 				listBillDetailResponse.add(billDetailResponse);
@@ -332,17 +356,15 @@ public class OrderService {
 
 	private void addBillDetailToOrderReponse(Room room, @Valid BillDetailRequest billDetailRequest) {
 		Bill bill = billRepository.findByBillId(billDetailRequest.getBillId());
-		Menu menu = menuRepository.findByMenuId(billDetailRequest.getMenuId());
+		Food food = foodRepository.findByFoodId(billDetailRequest.getFoodId());
 		if (bill != null) {
-			if (menu != null) {
+			if (food != null) {
 				boolean checkAddBillDetail = addBillDetail(billDetailRequest);
 
 				if (checkAddBillDetail) {
 					bill = updateTotalPrice(bill);
 					bill = billRepository.findByBillId(billDetailRequest.getBillId());
-
 				}
-
 			}
 		} else {
 			room.setStatus(0);
@@ -352,13 +374,13 @@ public class OrderService {
 
 	private boolean addBillDetail(@Valid BillDetailRequest billDetailRequest) {
 		try {
-			Optional<Menu> menu = menuRepository.findById(billDetailRequest.getMenuId());
+			Optional<Food> food = foodRepository.findById(billDetailRequest.getFoodId());
 			Bill bill = billRepository.findByBillId(billDetailRequest.getBillId());
-			BillDetails billDetails = billDetailsRepository.findByBillAndMenu(bill, menu.get());
+			BillDetails billDetails = billDetailsRepository.findByBillAndFood(bill, food.get());
 			int number = billDetailRequest.getNumber();
 			if (billDetails == null) {
 				BillDetailsKey billDetailsKey = new BillDetailsKey(billDetailRequest.getBillId(),
-						billDetailRequest.getMenuId());
+						billDetailRequest.getFoodId());
 				billDetails = new BillDetails(billDetailsKey);
 				if (number <= 0) {
 					return false;
@@ -371,11 +393,11 @@ public class OrderService {
 				}
 			}
 
-			double price = menu.get().getPrice() * number;
+			double price = food.get().getPrice() * number;
 			billDetails.setNumber(number);
 			billDetails.setUnitPrice(price);
 			billDetails.setBill(bill);
-			billDetails.setMenu(menu.get());
+			billDetails.setFood(food.get());
 			billDetailsRepository.save(billDetails);
 			return true;
 		} catch (Exception e) {
