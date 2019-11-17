@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.karaoke.management.api.response.ApiResponse;
@@ -32,6 +33,9 @@ public class ImportDatabaseService {
 	
 	@Autowired
 	FoodRepository foodRepository;
+	
+	@Autowired
+    PasswordEncoder passwordEncoder;
 
 	public ResponseEntity<?> improtDataBase() {
 		try {
@@ -39,7 +43,7 @@ public class ImportDatabaseService {
 			importRoomType();
 			improtFood();
 			importRoom();
-			return new ResponseEntity<Object>(new ApiResponse(false, "Improt database successfully"), HttpStatus.OK);
+			return new ResponseEntity<Object>(new ApiResponse(true, "Improt database successfully"), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
@@ -61,7 +65,7 @@ public class ImportDatabaseService {
 	}
 
 	private void importAccount() {
-		UserAccount userAccount = new UserAccount("khongaica1", "123", "Không Ai Cả");
+		UserAccount userAccount = new UserAccount("khongaica1", passwordEncoder.encode("123"), "Không Ai Cả");
 		if(!userAccountRepository.existsByUserName(userAccount.getUserName())) {
 			userAccountRepository.save(userAccount);
 		}
