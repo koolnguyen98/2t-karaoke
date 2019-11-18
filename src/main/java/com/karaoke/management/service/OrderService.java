@@ -214,8 +214,12 @@ public class OrderService {
 		Room room = updateCheckout(roomId);
 
 		Bill bill = updateBill(roomId, username);
-		bill  = calculateTotal(bill);
+		bill = calculateTotal(bill);
 		List<BillDetails> listBillDetails = billDetailsRepository.findByBill(bill);
+		if(bill.getTotal() < 100000.00) {
+			bill.setTotal(100000.00);
+			billRepository.save(bill);
+		}
 		orderResponse = createOrderReponse(room, bill, listBillDetails);
 
 		return orderResponse;
@@ -274,42 +278,42 @@ public class OrderService {
 
 	private Bill calculateTotal(Bill bill) {
 		double total = 0;
-		total = calculateTimeMoney(bill.getCheckin(), bill.getChecout(),
+		total = calculateTimeMoney(bill.getCheckin(), bill.getCheckout(),
 				(double) bill.getRoom().getRoomType().getPrice());
 
 		bill = updateTotalPrice(bill);
-		
+
 		bill.setTotal(total + bill.getTotal());
-		
+
 		bill = billRepository.save(bill);
 		return bill;
 	}
 
 	private double calculateTimeMoney(LocalDateTime checkinTime, LocalDateTime checkoutTime, double priceRoom) {
 
-			double result = 0;
+		double result = 0;
 
-			LocalDateTime tempDateTime = LocalDateTime.from(checkinTime);
+		LocalDateTime tempDateTime = LocalDateTime.from(checkinTime);
 
-			long hours = tempDateTime.until(checkoutTime, ChronoUnit.HOURS);
-			tempDateTime = tempDateTime.plusHours(hours);
+		long hours = tempDateTime.until(checkoutTime, ChronoUnit.HOURS);
+		tempDateTime = tempDateTime.plusHours(hours);
 
-			result += hours;
+		result += hours;
 
-			long minutes = tempDateTime.until(checkoutTime, ChronoUnit.MINUTES);
-			tempDateTime = tempDateTime.plusMinutes(minutes);
+		long minutes = tempDateTime.until(checkoutTime, ChronoUnit.MINUTES);
+		tempDateTime = tempDateTime.plusMinutes(minutes);
 
-			result += (double) minutes / 60;
+		result += (double) minutes / 60;
 
-			long seconds = tempDateTime.until(checkoutTime, ChronoUnit.SECONDS);
+		long seconds = tempDateTime.until(checkoutTime, ChronoUnit.SECONDS);
 
-			result += (double) seconds / 3600;
+		result += (double) seconds / 3600;
 
-			result = Math.round(result * 100.0) / 100.0;
+		result = Math.round(result * 100.0) / 100.0;
 
-			result = (double) result * priceRoom;
+		result = (double) result * priceRoom;
 
-			return result;
+		return result;
 	}
 
 	private OrderResponse createOrderReponse(Room room, Bill bill, List<BillDetails> listBillDetails) {
@@ -318,7 +322,7 @@ public class OrderService {
 		orderResponse.setRoom(roomResponse);
 
 		BillResponse billResponse = new BillResponse(bill.getBillId(), bill.getRoom().getRoomId(), bill.getCheckin(),
-				bill.getTotal(), bill.getUserAccount().getId());
+				bill.getCheckout(), bill.getTotal(), bill.getUserAccount().getId());
 		orderResponse.setBill(billResponse);
 
 		List<BillDetailResponse> listBillDetailResponse = new ArrayList<BillDetailResponse>();

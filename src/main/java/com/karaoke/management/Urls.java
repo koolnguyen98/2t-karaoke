@@ -38,4 +38,6 @@ public interface Urls {
 
 	public final String API_IMPORT_DATABASE = API + "/import";
 	
+	public final String API_REPORT_FROM_TO = API + "/report";
+	
 }

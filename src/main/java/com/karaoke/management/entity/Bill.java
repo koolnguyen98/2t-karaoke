@@ -43,13 +43,13 @@ public class Bill {
 	
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
-	@Column(name = "checkout", nullable = false)
+	@Column(name = "checkout")
 	LocalDateTime  checkout;
 	
-	@Column(name = "total", nullable = false)
+	@Column(name = "total")
 	double total;
 	
-	@Column(name = "detail", nullable = false)
+	@Column(name = "detail")
 	String details;
 	
 	@OneToMany(targetEntity=BillDetails.class, mappedBy = "bill", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -121,7 +121,7 @@ public class Bill {
 		this.checkin = checkin;
 	}
 
-	public LocalDateTime  getChecout() {
+	public LocalDateTime  getCheckout() {
 		return checkout;
 	}
 
