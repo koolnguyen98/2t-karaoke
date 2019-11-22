@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.karaoke.management.Urls;
+import com.karaoke.management.api.Urls;
 import com.karaoke.management.api.request.BillDetailRequest;
 import com.karaoke.management.service.OrderService;
 

@@ -1,4 +1,4 @@
-package com.karaoke.management;
+package com.karaoke.management.api;
 
 public interface Urls {
 	

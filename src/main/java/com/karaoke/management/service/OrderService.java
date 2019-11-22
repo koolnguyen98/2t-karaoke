@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import javax.validation.Valid;
 
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import com.karaoke.management.api.WriterLog;
 import com.karaoke.management.api.request.BillDetailRequest;
 import com.karaoke.management.api.response.ApiResponse;
 import com.karaoke.management.api.response.BillDetailResponse;
@@ -52,6 +54,8 @@ public class OrderService {
 
 	@Autowired
 	UserAccountRepository userAccountRepository;
+	
+	Logger logger = WriterLog.getLogger("Order Service");
 
 	public ResponseEntity<?> checkinRoom(int roomId, Authentication authentication) {
 		try {
@@ -60,18 +64,22 @@ public class OrderService {
 			if (checkStatus) {
 				OrderResponse orderResponse = createOrderWhenCheckIn(roomId, authentication.getName());
 				if (orderResponse != null) {
+					logger.info("Checkin successfully");
 					messageResponse = new MessageResponse("Checkin successfully", 200);
-					return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
+					return ResponseEntity.ok(orderResponse);
 
 				} else {
+					logger.info("Checkin unsuccessfully");
 					messageResponse = new MessageResponse("Couldn't checkin", 404);
 					return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponse);
 				}
 			} else {
+				logger.info("Checkin unsuccessfully");
 				messageResponse = new MessageResponse("Room not exist or room checked in", 404);
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponse);
 			}
 		} catch (Exception e) {
+			logger.warning(e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -85,17 +93,21 @@ public class OrderService {
 					List<BillDetails> listBillDetails = billDetailsRepository.findByBill(bill);
 					OrderResponse orderResponse = new OrderResponse();
 					orderResponse = createOrderReponse(room, bill, listBillDetails);
+					logger.info("Find bill by room " + id + "successfully");
 					return ResponseEntity.ok(orderResponse);
 				} else {
 					room.setStatus(0);
 					roomRepository.save(room);
+					logger.info("Find bill by room " + id + "unsuccessfully");
 					return new ResponseEntity<Object>(new ApiResponse(false, "Room uncheckin!"),
 							HttpStatus.BAD_REQUEST);
 				}
 			}
+			logger.info("Find bill by room " + id + "unsuccessfully");
 			return new ResponseEntity<Object>(new ApiResponse(false, "Room doesn't exist or room uncheckin!"),
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
+			logger.warning(e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -107,9 +119,11 @@ public class OrderService {
 				addBillDetailToOrderReponse(room, billDetailRequest);
 				return findBillByRoom(id);
 			}
+			logger.info("Add bill detail by room " + id + "unsuccessfully");
 			return new ResponseEntity<Object>(new ApiResponse(false, "Room doesn't exist or room uncheckin!"),
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
+			logger.warning(e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -123,9 +137,11 @@ public class OrderService {
 				}
 				return findBillByRoom(id);
 			}
+			logger.info("Add list bill details by room " + id + "successfully");
 			return new ResponseEntity<Object>(new ApiResponse(false, "Room doesn't exist or room uncheckin!"),
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
+			logger.warning(e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 
@@ -138,12 +154,15 @@ public class OrderService {
 				if (checkDeleteBillDetail) {
 					return findBillByRoom(id);
 				}
+				logger.info("Delete bill detail by room " + id + "unsuccessfully");
 				return new ResponseEntity<Object>(new ApiResponse(false, "Menu or bill doesn't exist!"),
 						HttpStatus.BAD_REQUEST);
 			}
+			logger.info("Delete bill detail by room " + id + "unsuccessfully");
 			return new ResponseEntity<Object>(new ApiResponse(false, "Room doesn't exist or room uncheckin!"),
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
+			logger.warning(e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -155,16 +174,20 @@ public class OrderService {
 			if (checkStatus) {
 				OrderResponse orderResponse = createOrderWhenCheckOut(roomId, authentication.getName());
 				if (orderResponse != null) {
+					logger.info("Checkout by room " + roomId + "successfully");
 					return ResponseEntity.ok(orderResponse);
 				} else {
+					logger.info("Checkout by room " + roomId + "unsuccessfully");
 					messageResponse = new MessageResponse("Couldn't checkout", 404);
 					return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponse);
 				}
 			} else {
+				logger.info("Checkout by room " + roomId + "unsuccessfully");
 				messageResponse = new MessageResponse("Room not exist or room can't checkout in", 404);
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponse);
 			}
 		} catch (Exception e) {
+			logger.warning(e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -405,6 +428,7 @@ public class OrderService {
 			billDetailsRepository.save(billDetails);
 			return true;
 		} catch (Exception e) {
+			logger.warning(e.toString());
 			return false;
 		}
 	}

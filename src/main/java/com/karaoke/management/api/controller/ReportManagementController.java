@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.karaoke.management.Urls;
+import com.karaoke.management.api.Urls;
 import com.karaoke.management.api.request.ReportRequest;
 import com.karaoke.management.service.ReportService;
 
