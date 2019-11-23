@@ -1,6 +1,9 @@
 package com.karaoke.management.service;
 
 import java.net.URI;
+import java.util.logging.Logger;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.karaoke.management.api.WriterLog;
 import com.karaoke.management.api.request.LoginRequest;
 import com.karaoke.management.api.request.SignUpRequest;
 import com.karaoke.management.api.response.ApiResponse;
@@ -37,6 +41,8 @@ public class UserAccountService {
     @Autowired
     JwtTokenProvider tokenProvider;
     
+    Logger logger = WriterLog.getLogger(UserAccountService.class.toString());
+    
     public UserAccount createAccount(SignUpRequest signUpRequest) {
     	// Creating user's account
         UserAccount userAccount = new UserAccount(signUpRequest.getUsername(), 
@@ -49,7 +55,7 @@ public class UserAccountService {
     	return result;
     }
     
-    public ResponseEntity<JwtAuthenticationResponse> userSigin(LoginRequest loginRequest) {
+    public ResponseEntity<JwtAuthenticationResponse> userSigin(LoginRequest loginRequest, HttpServletRequest request) {
     	
     	Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -64,7 +70,7 @@ public class UserAccountService {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
     
-    public ResponseEntity<?> userSigup(SignUpRequest signUpRequest){
+    public ResponseEntity<?> userSigup(SignUpRequest signUpRequest, HttpServletRequest request){
     	
     	if(checkUserAccount(signUpRequest.getUsername())) {
             return new ResponseEntity<Object>(new ApiResponse(false, "Username is already taken!"),

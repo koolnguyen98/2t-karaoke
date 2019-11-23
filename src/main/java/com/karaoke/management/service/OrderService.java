@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,36 +56,36 @@ public class OrderService {
 	@Autowired
 	UserAccountRepository userAccountRepository;
 	
-	Logger logger = WriterLog.getLogger("Order Service");
+	Logger logger = WriterLog.getLogger(OrderService.class.toString());
 
-	public ResponseEntity<?> checkinRoom(int roomId, Authentication authentication) {
+	public ResponseEntity<?> checkinRoom(int roomId, Authentication authentication, HttpServletRequest request) {
 		try {
 			boolean checkStatus = roomRepository.existsByRoomIdAndStatus(roomId, 0);
 			MessageResponse messageResponse = null;
 			if (checkStatus) {
 				OrderResponse orderResponse = createOrderWhenCheckIn(roomId, authentication.getName());
 				if (orderResponse != null) {
-					logger.info("Checkin successfully");
+					logger.info("Client " + request.getRemoteAddr() + ": " + "Checkin successfully");
 					messageResponse = new MessageResponse("Checkin successfully", 200);
 					return ResponseEntity.ok(orderResponse);
 
 				} else {
-					logger.info("Checkin unsuccessfully");
+					logger.info("Client " + request.getRemoteAddr() + ": " + "Checkin unsuccessfully");
 					messageResponse = new MessageResponse("Couldn't checkin", 404);
 					return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponse);
 				}
 			} else {
-				logger.info("Checkin unsuccessfully");
+				logger.info("Client " + request.getRemoteAddr() + ": " + "Checkin unsuccessfully");
 				messageResponse = new MessageResponse("Room not exist or room checked in", 404);
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponse);
 			}
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
-	public ResponseEntity<?> findBillByRoom(int id) {
+	public ResponseEntity<?> findBillByRoom(int id, HttpServletRequest request) {
 		try {
 			if (roomRepository.existsByRoomIdAndStatus(id, 1)) {
 				Room room = roomRepository.findByRoomId(id);
@@ -93,101 +94,101 @@ public class OrderService {
 					List<BillDetails> listBillDetails = billDetailsRepository.findByBill(bill);
 					OrderResponse orderResponse = new OrderResponse();
 					orderResponse = createOrderReponse(room, bill, listBillDetails);
-					logger.info("Find bill by room " + id + "successfully");
+					logger.info("Client " + request.getRemoteAddr() + ": " + "Find bill by room " + id + " successfully");
 					return ResponseEntity.ok(orderResponse);
 				} else {
 					room.setStatus(0);
 					roomRepository.save(room);
-					logger.info("Find bill by room " + id + "unsuccessfully");
+					logger.info("Client " + request.getRemoteAddr() + ": " + "Find bill by room " + id + " unsuccessfully");
 					return new ResponseEntity<Object>(new ApiResponse(false, "Room uncheckin!"),
 							HttpStatus.BAD_REQUEST);
 				}
 			}
-			logger.info("Find bill by room " + id + "unsuccessfully");
+			logger.info("Client " + request.getRemoteAddr() + ": " + "Find bill by room " + id + " unsuccessfully");
 			return new ResponseEntity<Object>(new ApiResponse(false, "Room doesn't exist or room uncheckin!"),
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
-	public ResponseEntity<?> addBillDetailRequest(int id, @Valid BillDetailRequest billDetailRequest) {
+	public ResponseEntity<?> addBillDetailRequest(int id, @Valid BillDetailRequest billDetailRequest, HttpServletRequest request) {
 		try {
 			if (roomRepository.existsByRoomIdAndStatus(id, 1)) {
 				Room room = roomRepository.findByRoomId(id);
-				addBillDetailToOrderReponse(room, billDetailRequest);
-				return findBillByRoom(id);
+				addBillDetailToOrderReponse(room, billDetailRequest, request);
+				return findBillByRoom(id, request);
 			}
-			logger.info("Add bill detail by room " + id + "unsuccessfully");
+			logger.info("Client " + request.getRemoteAddr() + ": " + "Add bill detail by room " + id + " unsuccessfully");
 			return new ResponseEntity<Object>(new ApiResponse(false, "Room doesn't exist or room uncheckin!"),
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
-	public ResponseEntity<?> addListBillDetailRequest(int id, @Valid List<BillDetailRequest> listBillDetailRequest) {
+	public ResponseEntity<?> addListBillDetailRequest(int id, @Valid List<BillDetailRequest> listBillDetailRequest, HttpServletRequest request) {
 		try {
 			if (roomRepository.existsByRoomIdAndStatus(id, 1)) {
 				Room room = roomRepository.findByRoomId(id);
 				for (BillDetailRequest billDetailRequest : listBillDetailRequest) {
-					addBillDetailToOrderReponse(room, billDetailRequest);
+					addBillDetailToOrderReponse(room, billDetailRequest, request);
 				}
-				return findBillByRoom(id);
+				return findBillByRoom(id, request);
 			}
-			logger.info("Add list bill details by room " + id + "successfully");
+			logger.info("Client " + request.getRemoteAddr() + ": " + "Add list bill details by room " + id + " successfully");
 			return new ResponseEntity<Object>(new ApiResponse(false, "Room doesn't exist or room uncheckin!"),
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 
 	}
 
-	public ResponseEntity<?> deleteBillDetail(int id, @Valid BillDetailRequest billDetailRequest) {
+	public ResponseEntity<?> deleteBillDetail(int id, @Valid BillDetailRequest billDetailRequest, HttpServletRequest request) {
 		try {
 			if (roomRepository.existsByRoomIdAndStatus(id, 1)) {
 				boolean checkDeleteBillDetail = deleteBillDetail(billDetailRequest);
 				if (checkDeleteBillDetail) {
-					return findBillByRoom(id);
+					return findBillByRoom(id, request);
 				}
-				logger.info("Delete bill detail by room " + id + "unsuccessfully");
+				logger.info("Client " + request.getRemoteAddr() + ": " + "Delete bill detail by room " + id + " unsuccessfully");
 				return new ResponseEntity<Object>(new ApiResponse(false, "Menu or bill doesn't exist!"),
 						HttpStatus.BAD_REQUEST);
 			}
-			logger.info("Delete bill detail by room " + id + "unsuccessfully");
+			logger.info("Client " + request.getRemoteAddr() + ": " + "Delete bill detail by room " + id + " unsuccessfully");
 			return new ResponseEntity<Object>(new ApiResponse(false, "Room doesn't exist or room uncheckin!"),
 					HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
-	public ResponseEntity<?> checkoutRoom(int roomId, Authentication authentication) {
+	public ResponseEntity<?> checkoutRoom(int roomId, Authentication authentication, HttpServletRequest request) {
 		try {
 			boolean checkStatus = roomRepository.existsByRoomIdAndStatus(roomId, 1);
 			MessageResponse messageResponse = null;
 			if (checkStatus) {
 				OrderResponse orderResponse = createOrderWhenCheckOut(roomId, authentication.getName());
 				if (orderResponse != null) {
-					logger.info("Checkout by room " + roomId + "successfully");
+					logger.info("Client " + request.getRemoteAddr() + ": " + "Checkout by room " + roomId + " successfully");
 					return ResponseEntity.ok(orderResponse);
 				} else {
-					logger.info("Checkout by room " + roomId + "unsuccessfully");
+					logger.info("Client " + request.getRemoteAddr() + ": " + "Checkout by room " + roomId + " unsuccessfully");
 					messageResponse = new MessageResponse("Couldn't checkout", 404);
 					return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponse);
 				}
 			} else {
-				logger.info("Checkout by room " + roomId + "unsuccessfully");
+				logger.info("Client " + request.getRemoteAddr() + ": " + "Checkout by room " + roomId + " unsuccessfully");
 				messageResponse = new MessageResponse("Room not exist or room can't checkout in", 404);
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponse);
 			}
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -381,12 +382,12 @@ public class OrderService {
 		return bill;
 	}
 
-	private void addBillDetailToOrderReponse(Room room, @Valid BillDetailRequest billDetailRequest) {
+	private void addBillDetailToOrderReponse(Room room, @Valid BillDetailRequest billDetailRequest, HttpServletRequest request) {
 		Bill bill = billRepository.findByBillId(billDetailRequest.getBillId());
 		Food food = foodRepository.findByFoodId(billDetailRequest.getFoodId());
 		if (bill != null) {
 			if (food != null) {
-				boolean checkAddBillDetail = addBillDetail(billDetailRequest);
+				boolean checkAddBillDetail = addBillDetail(billDetailRequest, request);
 
 				if (checkAddBillDetail) {
 					bill = updateTotalPrice(bill);
@@ -399,7 +400,7 @@ public class OrderService {
 		}
 	}
 
-	private boolean addBillDetail(@Valid BillDetailRequest billDetailRequest) {
+	private boolean addBillDetail(@Valid BillDetailRequest billDetailRequest, HttpServletRequest request) {
 		try {
 			Optional<Food> food = foodRepository.findById(billDetailRequest.getFoodId());
 			Bill bill = billRepository.findByBillId(billDetailRequest.getBillId());
@@ -428,7 +429,7 @@ public class OrderService {
 			billDetailsRepository.save(billDetails);
 			return true;
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return false;
 		}
 	}

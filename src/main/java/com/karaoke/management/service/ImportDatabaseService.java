@@ -2,6 +2,9 @@ package com.karaoke.management.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.karaoke.management.api.WriterLog;
 import com.karaoke.management.api.response.ApiResponse;
 import com.karaoke.management.entity.Food;
 import com.karaoke.management.entity.Room;
@@ -36,15 +40,19 @@ public class ImportDatabaseService {
 	
 	@Autowired
     PasswordEncoder passwordEncoder;
+	
+	Logger logger = WriterLog.getLogger(ImportDatabaseService.class.toString());
 
-	public ResponseEntity<?> improtDataBase() {
+	public ResponseEntity<?> improtDataBase(HttpServletRequest request) {
 		try {
 			importAccount();
 			importRoomType();
 			improtFood();
 			importRoom();
+			logger.info("Client " + request.getRemoteAddr() + ": " + "Improt database successfully");
 			return new ResponseEntity<Object>(new ApiResponse(true, "Improt database successfully"), HttpStatus.OK);
 		} catch (Exception e) {
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}

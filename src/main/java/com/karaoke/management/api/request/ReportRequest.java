@@ -16,11 +16,20 @@ public class ReportRequest {
 	@DateTimeFormat(pattern = "yyyy-MM-dd", iso = ISO.DATE)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime toDate;
+	
+	@DateTimeFormat(pattern = "yyyy-MM-dd", iso = ISO.DATE)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+	private LocalDateTime dayReport;
 
 	public ReportRequest(LocalDateTime fromDate, LocalDateTime toDate) {
 		super();
 		this.fromDate = fromDate;
 		this.toDate = toDate;
+	}
+	
+	public ReportRequest(LocalDateTime dayReport) {
+		super();
+		this.dayReport = dayReport;
 	}
 	
 	public ReportRequest() {
@@ -42,5 +51,17 @@ public class ReportRequest {
 	public void setToDate(LocalDateTime toDate) {
 		this.toDate = toDate;
 	}
+
+	public LocalDateTime getDayReport() {
+		return dayReport;
+	}
+
+	public void setDayReport(LocalDateTime dayReport) {
+		this.dayReport = dayReport;
+	}
+	
+	
+	
+	
 	
 }

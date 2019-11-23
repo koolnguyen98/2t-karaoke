@@ -30,6 +30,8 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	Bill findFirstByRoomOrderByBillIdDesc(Room room);
 
-	@Query(value = "SELECT * FROM bill WHERE bill.checkin >= ?1 and bill.checkin <= ?2", nativeQuery = true)
+	@Query(value = "SELECT * FROM bill WHERE bill.checkout >= ?1 and bill.checkout <= ?2", nativeQuery = true)
 	List<Bill> findBillFromTo(LocalDateTime fromDate, LocalDateTime toDate);
+
+	List<Bill> findBillByCheckout(LocalDateTime checkoutDate);
 }

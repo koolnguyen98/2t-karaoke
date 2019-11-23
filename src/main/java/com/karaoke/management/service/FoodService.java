@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +30,9 @@ public class FoodService {
 	@Autowired
 	BillDetailsRepository billDetailsRepository;
 	
-	Logger logger = WriterLog.getLogger("Food Service");
+	Logger logger = WriterLog.getLogger(FoodService.class.toString());
 
-	public ResponseEntity<?> findAll() {
+	public ResponseEntity<?> findAll(HttpServletRequest request) {
 		try {
 			List<Food> listfood = foodRepository.findAll();
 			List<FoodResponse> listfoodResponses = new ArrayList<FoodResponse>();
@@ -40,53 +41,54 @@ public class FoodService {
 						food.getPrice());
 				listfoodResponses.add(foodResponse);
 			}
-			logger.info("Get all food successfully");
+			logger.info("Client " + request.getRemoteAddr() + ": " + "Get all food successfully");
 			return ResponseEntity.ok(listfoodResponses);
 
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
-	public ResponseEntity<?> findById(int id) {
+	public ResponseEntity<?> findById(int id, HttpServletRequest request) {
 		try {
 			Food food = foodRepository.findByFoodId(id);
 	    	if (food == null) {
-	    		logger.info("Get food by " + id + " unsuccessfully");
+	    		logger.info("Client " + request.getRemoteAddr() + ": " + "Get food by " + id + " unsuccessfully");
 	    		return new ResponseEntity<Object>(new ApiResponse(false, "Dishes doesn't exist!"), HttpStatus.NOT_FOUND);
 	        } else {
-	        	logger.info("Get food by " + id + " successfully");
+	        	logger.info("Client " + request.getRemoteAddr() + ": " + "Get food by " + id + " successfully");
 		    	FoodResponse foodResponse = new FoodResponse(food.getFoodId(), food.getEatingName(), food.getUnit(), food.getPrice());
 		    	return ResponseEntity.ok(foodResponse);
 	        }
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 
 	}
 	
-	public ResponseEntity<?> updateById(int id, FoodRequest foodRequest) {
+	public ResponseEntity<?> updateById(int id, FoodRequest foodRequest, HttpServletRequest request) {
 		try {
 			Food food = foodRepository.findByFoodId(id);
 	        if (food == null) {
+	        	logger.info("Client " + request.getRemoteAddr() + ": " + "Update food unsuccessfully");
 	        	return new ResponseEntity<Object>(new ApiResponse(false, "Dishes doesn't exist!"), HttpStatus.NOT_FOUND);
 	        } else {
 	        	if(foodRepository.existsByEatingName(foodRequest.getEatingName()) || foodRequest.getEatingName() == "" || foodRequest.getEatingName() == null) {
-	        		logger.info("Update food Eating name is already taken!");
+	        		logger.info("Client " + request.getRemoteAddr() + ": " + "Update food Eating name is already taken!");
 	        		return new ResponseEntity<Object>(new ApiResponse(false, "Eating name is already taken!"),
 		                    HttpStatus.BAD_REQUEST);
 		        }
 		    	
 		    	if(foodRequest.getUnit() == "" || foodRequest.getUnit() == null) {
-		    		logger.info("Update food Unit not null!");
+		    		logger.info("Client " + request.getRemoteAddr() + ": " + "Update food Unit not null!");
 		            return new ResponseEntity<Object>(new ApiResponse(false, "Unit not null!"),
 		                    HttpStatus.BAD_REQUEST);
 		        }
 		    	
 		    	if(foodRequest.getPrice() < 0 || foodRequest.getPrice() == 0) {
-		    		logger.info("Update food Price > 0!");
+		    		logger.info("Client " + request.getRemoteAddr() + ": " + "Update food Price > 0!");
 		            return new ResponseEntity<Object>(new ApiResponse(false, "Price > 0!"),
 		                    HttpStatus.BAD_REQUEST);
 		        }
@@ -95,57 +97,57 @@ public class FoodService {
 	        			updatedfood.getEatingName(), 
 	        			updatedfood.getUnit(), 
 	        			updatedfood.getPrice());
-	        	logger.info("Update food successfully!");
+	        	logger.info("Client " + request.getRemoteAddr() + ": " + "Update food successfully!");
 	            return ResponseEntity.ok(foodResponse);
 	        }
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 	
-	public ResponseEntity<?> deleteById(int id) {
+	public ResponseEntity<?> deleteById(int id, HttpServletRequest request) {
 		try {
 			boolean deletefood = deleteFoodById(id);
 	    	MessageResponse messageResponse = null;
 	    	if (!deletefood) {
-	    		logger.info("Update food by " + id + " unsuccessfully!");
+	    		logger.info("Client " + request.getRemoteAddr() + ": " + "Update food by " + id + " unsuccessfully!");
 	    		messageResponse = new MessageResponse("Dishes doesn't exist!", 404);
 	    		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponse);
 			}
-	    	logger.info("Update food by " + id + " successfully!");
+	    	logger.info("Client " + request.getRemoteAddr() + ": " + "Update food by " + id + " successfully!");
 	    	messageResponse = new MessageResponse("Delete food Access", 200);
 			return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 
 	}
 	
-	public ResponseEntity<?> create(FoodRequest foodRequest) {
+	public ResponseEntity<?> create(FoodRequest foodRequest, HttpServletRequest request) {
 		try {
 			if(foodRepository.existsByEatingName(foodRequest.getEatingName())) {
-				logger.info("Update food Eating name is already taken!");
+				logger.info("Client " + request.getRemoteAddr() + ": " + "Update food Eating name is already taken!");
 	            return new ResponseEntity<Object>(new ApiResponse(false, "Eating name is already taken!"),
 	                    HttpStatus.BAD_REQUEST);
 	        }
 	    	
 	    	if(foodRequest.getUnit() == "" || foodRequest.getUnit() == null) {
-	    		logger.info("Update food Unit not null!");
+	    		logger.info("Client " + request.getRemoteAddr() + ": " + "Update food Unit not null!");
 	            return new ResponseEntity<Object>(new ApiResponse(false, "Unit not null!"),
 	                    HttpStatus.BAD_REQUEST);
 	        }
 	    	
 	    	if(foodRequest.getPrice() < 0 || foodRequest.getPrice() == 0) {
-	    		logger.info("Update food Price > 0!");
+	    		logger.info("Client " + request.getRemoteAddr() + ": " + "Update food Price > 0!");
 	            return new ResponseEntity<Object>(new ApiResponse(false, "Price > 0!"),
 	                    HttpStatus.BAD_REQUEST);
 	        }
 	    	
 	        Food createdfood = createFood(foodRequest);
 	        if (createdfood == null) {
-	        	logger.info("Create food by unsuccessfully!");
+	        	logger.info("Client " + request.getRemoteAddr() + ": " + "Create food by unsuccessfully!");
 	        	return new ResponseEntity<Object>(new ApiResponse(false, "Cann't creat dishes!"), HttpStatus.NOT_FOUND);
 	        } else {
 
@@ -153,11 +155,11 @@ public class FoodService {
 	            		createdfood.getEatingName(), 
 	            		createdfood.getUnit(), 
 	            		createdfood.getPrice());
-	            logger.info("Create food by successfully!");
+	            logger.info("Client " + request.getRemoteAddr() + ": " + "Create food by successfully!");
 				return ResponseEntity.ok(foodResponse);
 	        }
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 

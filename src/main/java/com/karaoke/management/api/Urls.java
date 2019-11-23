@@ -39,5 +39,8 @@ public interface Urls {
 	public final String API_IMPORT_DATABASE = API + "/import";
 	
 	public final String API_REPORT_FROM_TO = API + "/report";
+	public final String API_REPORT_DAY = API_REPORT_FROM_TO + "/day";
+	public final String API_REPORT_MONTH = API_REPORT_FROM_TO + "/month";
+	public final String API_REPORT_YEAR = API_REPORT_FROM_TO + "/year";
 	
 }

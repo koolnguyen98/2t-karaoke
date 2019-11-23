@@ -2,6 +2,8 @@ package com.karaoke.management.api.controller;
 
 import java.net.URISyntaxException;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +19,8 @@ public class ImportDatabaseController {
 	ImportDatabaseService importDatabaseService;
 
 	@GetMapping(value = Urls.API_IMPORT_DATABASE)
-	public ResponseEntity<?> importDatabase() throws URISyntaxException {
-		return importDatabaseService.improtDataBase();
+	public ResponseEntity<?> importDatabase(HttpServletRequest request) throws URISyntaxException {
+		return importDatabaseService.improtDataBase(request);
 	}
 	
 }

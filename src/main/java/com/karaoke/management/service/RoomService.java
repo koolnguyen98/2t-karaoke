@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +35,9 @@ public class RoomService {
 	@Autowired
 	BillRepository billRepository;
 
-	Logger logger = WriterLog.getLogger("Room Service");
+	Logger logger = WriterLog.getLogger(RoomService.class.toString());
 
-	public ResponseEntity<Object> updateRoomById(int id, RoomRequest roomRequest) {
+	public ResponseEntity<Object> updateRoomById(int id, RoomRequest roomRequest, HttpServletRequest request) {
 		try {
 			boolean checkRoom = roomRepository.existsById(id);
 
@@ -47,19 +49,19 @@ public class RoomService {
 						new RoomTypeResponse(roomUpdate.getRoomType().getTypeId(),
 								roomUpdate.getRoomType().getTypeName(), roomUpdate.getRoomType().getPrice()),
 						roomUpdate.getStatus());
-				logger.info("Update room " + id + " successfully");
+				logger.info("Client " + request.getRemoteAddr() + ": " + "Update room " + id + " successfully");
 				return new ResponseEntity<Object>(new ApiResponse(true, roomResponse), HttpStatus.OK);
 			} else {
-				logger.info("Update room " + id + " unsuccessfully");
-				return new ResponseEntity<Object>(new ApiResponse(false, "Could't update room!"), HttpStatus.NOT_FOUND);
+				logger.info("Client " + request.getRemoteAddr() + ": " + "Update room " + id + " unsuccessfully");
+				return new ResponseEntity<Object>(new ApiResponse(false, "Client " + request.getRemoteAddr() + ": " + "Could't update room!"), HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
-	public ResponseEntity<Object> deleteRoomById(int id) {
+	public ResponseEntity<Object> deleteRoomById(int id, HttpServletRequest request) {
 		try {
 			Room room = roomRepository.findByRoomId(id);
 			if (room != null) {
@@ -67,51 +69,51 @@ public class RoomService {
 
 				if (!checkExitBill) {
 					roomRepository.delete(room);
-					logger.info("Delete room " + id + " successfully");
+					logger.info("Client " + request.getRemoteAddr() + ": " + "Delete room " + id + " successfully");
 					return new ResponseEntity<Object>(new ApiResponse(false, "Delete Room Access"), HttpStatus.OK);
 				}
-				logger.info("Delete room " + id + " unsuccessfully");
+				logger.info("Client " + request.getRemoteAddr() + ": " + "Delete room " + id + " unsuccessfully");
 				return new ResponseEntity<Object>(new ApiResponse(false, "Could't delete room!"), HttpStatus.NOT_FOUND);
 			}
-			logger.info("Delete room " + id + " unsuccessfully");
+			logger.info("Client " + request.getRemoteAddr() + ": " + "Delete room " + id + " unsuccessfully");
 			return new ResponseEntity<Object>(new ApiResponse(false, "Room does not exist"), HttpStatus.NOT_FOUND);
 
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 
 	}
 
-	public ResponseEntity<Object> createRoom(RoomRequest roomRequest) {
+	public ResponseEntity<Object> createRoom(RoomRequest roomRequest, HttpServletRequest request) {
 		try {
 			if (checkIsRoomExist(roomRequest.getRoomName().trim())) {
-				logger.info("Create room name is already taken!");
+				logger.info("Client " + request.getRemoteAddr() + ": " + "Create room name is already taken!");
 				return new ResponseEntity<Object>(new ApiResponse(false, "Room name is already taken!"),
 						HttpStatus.BAD_REQUEST);
 			}
 
 			if (!checkRoomRequest(roomRequest.getRoomTypeId())) {
-				logger.info("Create room Type no exist!");
+				logger.info("Client " + request.getRemoteAddr() + ": " + "Create room Type no exist!");
 				return new ResponseEntity<Object>(new ApiResponse(false, "Room Type no exist!"),
 						HttpStatus.BAD_REQUEST);
 			}
 
 			Room room = saveRoom(roomRequest);
 			if (room == null) {
-				logger.info("Create room unsuccessfully!");
+				logger.info("Client " + request.getRemoteAddr() + ": " + "Create room unsuccessfully!");
 				return ResponseEntity.notFound().build();
 			} else {
-				logger.info("Create room successfully!");
+				logger.info("Client " + request.getRemoteAddr() + ": " + "Create room successfully!");
 				return ResponseEntity.ok("Successfully");
 			}
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
-	public ResponseEntity<?> findAll() {
+	public ResponseEntity<?> findAll(HttpServletRequest request) {
 		try {
 			List<Room> listRoom = roomRepository.findAll();
 			if (listRoom != null) {
@@ -123,45 +125,45 @@ public class RoomService {
 							room.getStatus());
 					roomResponses.add(roomReponse);
 				}
-				logger.info("Get all room successfully");
+				logger.info("Client " + request.getRemoteAddr() + ": " + "Get all room successfully");
 				return ResponseEntity.ok(roomResponses);
 			} else {
-				logger.info("Room does't exist!");
+				logger.info("Client " + request.getRemoteAddr() + ": " + "Room does't exist!");
 				return new ResponseEntity<Object>(new ApiResponse(false, "Room does't exist!"), HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
-	public ResponseEntity<?> findById(int id) {
+	public ResponseEntity<?> findById(int id, HttpServletRequest request) {
 		try {
 			Room room = roomRepository.findByRoomId(id);
 			if (room == null) {
-				logger.info("Get room by " + id + " unsuccessfully");
+				logger.info("Client " + request.getRemoteAddr() + ": " + "Get room by " + id + " unsuccessfully");
 				return new ResponseEntity<Object>(new ApiResponse(false, "Could't get room!"), HttpStatus.NOT_FOUND);
 			} else {
 				RoomTypeResponse roomTypeResponse = new RoomTypeResponse(room.getRoomType().getTypeId(),
 						room.getRoomType().getTypeName(), room.getRoomType().getPrice());
 				RoomResponse roomResponse = new RoomResponse(room.getRoomId(), room.getRoomName(), roomTypeResponse,
 						room.getStatus());
-				logger.info("Get room by " + id + " successfully");
+				logger.info("Client " + request.getRemoteAddr() + ": " + "Get room by " + id + " successfully");
 				return ResponseEntity.ok(roomResponse);
 			}
 		} catch (Exception e) {
-			logger.warning(e.toString());
+			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return new ResponseEntity<Object>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
-	private RoomResponse createRoomResponse(Room room) {
-		RoomResponse roomResponse = new RoomResponse(room.getRoomId(), room.getRoomName(),
-				new RoomTypeResponse(room.getRoomType().getTypeId(), room.getRoomType().getTypeName(),
-						room.getRoomType().getPrice()),
-				room.getStatus());
-		return roomResponse;
-	}
+//	private RoomResponse createRoomResponse(Room room) {
+//		RoomResponse roomResponse = new RoomResponse(room.getRoomId(), room.getRoomName(),
+//				new RoomTypeResponse(room.getRoomType().getTypeId(), room.getRoomType().getTypeName(),
+//						room.getRoomType().getPrice()),
+//				room.getStatus());
+//		return roomResponse;
+//	}
 
 	private Room saveRoom(RoomRequest roomRequest) {
 

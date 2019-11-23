@@ -22,15 +22,15 @@ public class Report {
 	
 	int totalBill;
 	
-	List<BillReport> billReports;
+	List<DateReport> dateReports;
 
-	public Report(LocalDateTime fromDate, LocalDateTime toDate, double total, int totalBill, List<BillReport> billReports) {
+	public Report(LocalDateTime fromDate, LocalDateTime toDate, double total, int totalBill, List<DateReport> dateReports) {
 		super();
 		this.fromDate = fromDate;
 		this.toDate = toDate;
 		this.total = total;
 		this.totalBill = totalBill;
-		this.billReports = billReports;
+		this.dateReports = dateReports;
 	}
 	
 	public Report() {
@@ -69,12 +69,12 @@ public class Report {
 		this.totalBill = totalBill;
 	}
 
-	public List<BillReport> getBillReports() {
-		return billReports;
+	public List<DateReport> getDateReports() {
+		return dateReports;
 	}
 
-	public void setBillReports(List<BillReport> billReports) {
-		this.billReports = billReports;
+	public void setDateReports(List<DateReport> dateReports) {
+		this.dateReports = dateReports;
 	}
 
 }

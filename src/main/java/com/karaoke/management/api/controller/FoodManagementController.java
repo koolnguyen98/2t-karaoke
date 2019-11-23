@@ -2,6 +2,7 @@ package com.karaoke.management.api.controller;
 
 import java.net.URISyntaxException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,28 +30,28 @@ public class FoodManagementController {
 	FoodService foodService;
 
 	@GetMapping(value = Urls.API_FOOD_FIND_ALL)
-	public ResponseEntity<?> findAll() {
-		return foodService.findAll();
+	public ResponseEntity<?> findAll(HttpServletRequest request) {
+		return foodService.findAll(request);
 	}
 
 	@GetMapping(value = Urls.API_FOOD_FIND_BY_ID)
-	public ResponseEntity<?> findRoomById(@PathVariable int id) {
-		return foodService.findById(id);
+	public ResponseEntity<?> findRoomById(@PathVariable int id, HttpServletRequest request) {
+		return foodService.findById(id, request);
 	}
 
 	@PutMapping(value = Urls.API_FOOD_UPDATE_BY_ID)
-	public ResponseEntity<?> updatefood(@RequestBody FoodRequest foodRequest, @PathVariable int id) {
-		return foodService.updateById(id, foodRequest);
+	public ResponseEntity<?> updatefood(@RequestBody FoodRequest foodRequest, @PathVariable int id, HttpServletRequest request) {
+		return foodService.updateById(id, foodRequest, request);
 	}
 
 	@DeleteMapping(value = Urls.API_FOOD_DELETE_BY_ID)
-	public ResponseEntity<?> deletefood(@PathVariable int id) {
-		return foodService.deleteById(id);
+	public ResponseEntity<?> deletefood(@PathVariable int id, HttpServletRequest request) {
+		return foodService.deleteById(id, request);
 
 	}
 
 	@PostMapping(value = Urls.API_FOOD_CREATE)
-	public ResponseEntity<?> create(@Valid @RequestBody FoodRequest foodRequest) throws URISyntaxException {
-		return foodService.create(foodRequest);
+	public ResponseEntity<?> create(@Valid @RequestBody FoodRequest foodRequest, HttpServletRequest request) throws URISyntaxException {
+		return foodService.create(foodRequest, request);
 	}
 }
