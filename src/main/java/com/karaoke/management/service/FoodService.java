@@ -42,6 +42,7 @@ public class FoodService {
 				listfoodResponses.add(foodResponse);
 			}
 			logger.info("Client " + request.getRemoteAddr() + ": " + "Get all food successfully");
+			logger.info("Client " + request.getRemoteAddr() + ": " + "Get all food successfully");
 			return ResponseEntity.ok(listfoodResponses);
 
 		} catch (Exception e) {
