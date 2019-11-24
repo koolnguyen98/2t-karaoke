@@ -59,10 +59,10 @@ public class ImportDatabaseService {
 
 	private void importRoomType() {
 		List<RoomType> roomTypes = new ArrayList<RoomType>();
-		RoomType roomType1 = new RoomType("Phòng thường", 200000);
+		RoomType roomType1 = new RoomType("Standard", 200000);
 		roomTypes.add(roomType1);
 		
-		RoomType roomType2 = new RoomType("Phòng vip", 300000);
+		RoomType roomType2 = new RoomType("VIP", 300000);
 		roomTypes.add(roomType2);
 		
 		for (RoomType roomType : roomTypes) {
@@ -73,7 +73,7 @@ public class ImportDatabaseService {
 	}
 
 	private void importAccount() {
-		UserAccount userAccount = new UserAccount("khongaica1", passwordEncoder.encode("123"), "Không Ai Cả");
+		UserAccount userAccount = new UserAccount("noname1", passwordEncoder.encode("123"), "No Name");
 		if(!userAccountRepository.existsByUserName(userAccount.getUserName())) {
 			userAccountRepository.save(userAccount);
 		}
@@ -81,19 +81,19 @@ public class ImportDatabaseService {
 
 	private void improtFood() {
 		List<Food> foods = new ArrayList<Food>();
-		Food food1 = new Food("Nước suối", "Chai", 15000);
+		Food food1 = new Food("Spring water", "Bottle", 15000);
 		foods.add(food1);
 		
-		Food food2 = new Food("Bia Tiger", "Lon", 25000);
+		Food food2 = new Food("Tiger Beer", "Bottle", 25000);
 		foods.add(food2);
 		
-		Food food3 = new Food("Trái cây", "Dĩa", 150000);
+		Food food3 = new Food("Mix Fruits", "Dishes", 150000);
 		foods.add(food3);
 		
-		Food food4 = new Food("Bánh snack", "Bich", 15000);
+		Food food4 = new Food("Snack", "Bags", 15000);
 		foods.add(food4);
 		
-		Food food5 = new Food("Nước ngọt", "Chai", 20000);
+		Food food5 = new Food("CocaCola", "Bottle", 20000);
 		foods.add(food5);
 		
 		for (Food food : foods) {
