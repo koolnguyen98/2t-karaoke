@@ -20,21 +20,25 @@ public class Food {
 	@Id
 	@GeneratedValue
 	@Column(name = "id")
-	int foodId;
+	private int foodId;
 
 	@NotNull
 	@Size(max = 65)
 	@Column(name = "food_name", nullable = false)
-	String eatingName;
+	private String eatingName;
 
 	@NotNull
 	@Size(max = 20)
 	@Column(name = "unit", nullable = false)
-	String unit;
+	private String unit;
 
 	@NotNull
 	@Column(name = "price", nullable = false)
-	double price;
+	private double price;
+	
+	@Column(name = "image_url", columnDefinition = "varchar(255) default '\\src\\main\\resources\\image\\food\\default.jpg'")
+	@Size(max = 255)
+	private  String imgLink;
 	
 	@Column(name = "is_delete", nullable = false, columnDefinition = "boolean default false")
 	private boolean isDelete;
@@ -99,6 +103,10 @@ public class Food {
 
 	public void setDelete(boolean isDelete) {
 		this.isDelete = isDelete;
+	}
+	
+	public static void main(String[] agrs) {
+		
 	}
 
 }

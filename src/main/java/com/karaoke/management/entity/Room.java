@@ -25,12 +25,12 @@ public class Room {
 	@Id
     @GeneratedValue
     @Column(name = "id")
-	int roomId;
+	private int roomId;
 	
 	@NotNull
 	@Size(max = 20)
 	@Column(name = "room_name", nullable = false)
-	String roomName;
+	private String roomName;
 	
 	@NotNull
 	@ManyToOne()

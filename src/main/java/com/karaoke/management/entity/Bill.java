@@ -28,29 +28,29 @@ public class Bill {
 	@Id
     @GeneratedValue
     @Column(name = "id")
-	int billId;
+	private int billId;
 	
 	@NotNull
 	@ManyToOne(targetEntity=Room.class)
     @JoinColumn(name="room_id", nullable = false) 
-	Room room;
+	private Room room;
 	
 	@NotNull
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	@Column(name = "checkin", nullable = false)
-	LocalDateTime  checkin;
+	private LocalDateTime  checkin;
 	
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm", iso = ISO.DATE)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	@Column(name = "checkout")
-	LocalDateTime  checkout;
+	private LocalDateTime  checkout;
 	
 	@Column(name = "total")
 	double total;
 	
 	@Column(name = "detail")
-	String details;
+	private String details;
 	
 	@OneToMany(targetEntity=BillDetails.class, mappedBy = "bill", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Food> menus = new ArrayList<Food>();
