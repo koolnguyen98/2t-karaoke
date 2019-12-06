@@ -17,8 +17,11 @@ import com.karaoke.management.api.request.FoodRequest;
 import com.karaoke.management.api.response.ApiResponse;
 import com.karaoke.management.api.response.FoodResponse;
 import com.karaoke.management.api.response.MessageResponse;
+import com.karaoke.management.entity.Bill;
+import com.karaoke.management.entity.BillDetails;
 import com.karaoke.management.entity.Food;
 import com.karaoke.management.reponsitory.BillDetailsRepository;
+import com.karaoke.management.reponsitory.BillRepository;
 import com.karaoke.management.reponsitory.FoodRepository;
 
 @Service
@@ -30,11 +33,14 @@ public class FoodService {
 	@Autowired
 	BillDetailsRepository billDetailsRepository;
 	
+	@Autowired
+	BillRepository billRepository;
+	
 	Logger logger = WriterLog.getLogger(FoodService.class.toString());
 
 	public ResponseEntity<?> findAll(HttpServletRequest request) {
 		try {
-			List<Food> listfood = foodRepository.findAll();
+			List<Food> listfood = foodRepository.findAllFood();
 			List<FoodResponse> listfoodResponses = new ArrayList<FoodResponse>();
 			for (Food food : listfood) {
 				FoodResponse foodResponse = new FoodResponse(food.getFoodId(), food.getEatingName(), food.getUnit(),
@@ -185,13 +191,21 @@ public class FoodService {
 
 			if (!checkExitBillDetail) {
 				foodRepository.delete(food);
-				return !checkExitBillDetail;
+			}else {
+				List<Bill> checkBillSuccess = billRepository.findBillSuccess();
+				for (Bill bill : checkBillSuccess) {
+					List<BillDetails> billDetails = billDetailsRepository.findByBill(bill);
+					for (BillDetails billDetail : billDetails) {
+						if(billDetail.getFood() == food) {
+							return false;
+						}
+					}
+				}
+				food.setDelete(true);
+				foodRepository.save(food);
 			}
-
-			return !checkExitBillDetail;
-
+			return true;
 		}
-
 		return false;
 	}
 

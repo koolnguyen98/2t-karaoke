@@ -104,8 +104,8 @@ public class ImportDatabaseService {
 	}
 
 	private void importRoom() {
-		RoomType std = roomTypeRepository.findByTypeId(1);
-		RoomType vip = roomTypeRepository.findByTypeId(2);
+		RoomType std = roomTypeRepository.findByTypeId(1).get();
+		RoomType vip = roomTypeRepository.findByTypeId(2).get();
 		
 		List<Room> rooms = new ArrayList<Room>();
 		Room room1 = new Room("STD 001", std, 0);

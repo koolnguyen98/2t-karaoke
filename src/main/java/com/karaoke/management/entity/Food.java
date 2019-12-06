@@ -35,6 +35,9 @@ public class Food {
 	@NotNull
 	@Column(name = "price", nullable = false)
 	double price;
+	
+	@Column(name = "is_delete", nullable = false, columnDefinition = "boolean default false")
+	private boolean isDelete;
 
 	@OneToMany(targetEntity=BillDetails.class, mappedBy = "food", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Bill> bills = new ArrayList<Bill>();
@@ -88,6 +91,14 @@ public class Food {
 
 	public void setBills(List<Bill> bills) {
 		this.bills = bills;
+	}
+
+	public boolean isDelete() {
+		return isDelete;
+	}
+
+	public void setDelete(boolean isDelete) {
+		this.isDelete = isDelete;
 	}
 
 }

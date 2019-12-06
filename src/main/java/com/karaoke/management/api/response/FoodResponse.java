@@ -2,7 +2,7 @@ package com.karaoke.management.api.response;
 
 public class FoodResponse {
 	
-	int menuId;
+	int foodId;
 	
 	String eatingName;
 	
@@ -14,20 +14,20 @@ public class FoodResponse {
 		super();
 	}
 
-	public FoodResponse(int menuId, String eatingName, String unit, double price) {
+	public FoodResponse(int foodId, String eatingName, String unit, double price) {
 		super();
-		this.menuId = menuId;
+		this.foodId = foodId;
 		this.eatingName = eatingName;
 		this.unit = unit;
 		this.price = price;
 	}
 
-	public int getMenuId() {
-		return menuId;
+	public int getFoodId() {
+		return foodId;
 	}
 
-	public void setMenuId(int menuId) {
-		this.menuId = menuId;
+	public void setFoodId(int foodId) {
+		this.foodId = foodId;
 	}
 
 	public String getEatingName() {

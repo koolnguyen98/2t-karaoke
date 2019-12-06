@@ -41,6 +41,9 @@ public class Room {
 	@Column(name = "status", nullable = false)
 	int  status;
 	
+	@Column(name = "is_delete", nullable = false, columnDefinition = "boolean default false")
+	private boolean isDelete;
+	
 	@OneToMany(targetEntity=Bill.class, mappedBy="room",cascade=CascadeType.ALL, fetch = FetchType.LAZY)    
 	private List<Bill> bills = new ArrayList<Bill>();
 
@@ -95,7 +98,13 @@ public class Room {
 	public void setBills(List<Bill> bills) {
 		this.bills = bills;
 	}
-	
-	
+
+	public boolean isDelete() {
+		return isDelete;
+	}
+
+	public void setDelete(boolean isDelete) {
+		this.isDelete = isDelete;
+	}
 	
 }
