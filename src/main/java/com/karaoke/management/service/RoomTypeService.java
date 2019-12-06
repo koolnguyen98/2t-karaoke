@@ -171,8 +171,11 @@ public class RoomTypeService {
 	}
 
 	private boolean deleteRoomTypeById(int id) {
-		RoomType roomType = roomTypeRepository.findByTypeId(id).get();
-
+		Optional<RoomType> opRoomType = roomTypeRepository.findByTypeId(id);
+		RoomType roomType = null;
+		if(opRoomType.isPresent()) {
+			roomType = opRoomType.get();
+		}
 		if (roomType != null) {
 			boolean checkExitRoom = roomRepository.existsByRoomType(roomType);
 			if (!checkExitRoom) {
@@ -184,7 +187,6 @@ public class RoomTypeService {
 //				roomTypeRepository.save(roomType);
 			}
 		}
-
 		return false;
 	}
 
