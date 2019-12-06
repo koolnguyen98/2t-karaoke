@@ -3,6 +3,7 @@ package com.karaoke.management.reponsitory;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -34,4 +35,10 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	List<Bill> findBillFromTo(LocalDateTime fromDate, LocalDateTime toDate);
 
 	List<Bill> findBillByCheckout(LocalDateTime checkoutDate);
+	
+	@Query(value = "SELECT * FROM bill WHERE bill.room_id = ?1 and bill.checkout IS NULL ORDER BY bill.id DESC LIMIT 1", nativeQuery = true)
+	Optional<Bill> checkBillSuccess(int id);
+
+	@Query(value = "SELECT * FROM bill WHERE bill.checkout IS NULL", nativeQuery = true)
+	List<Bill> findBillSuccess();
 }

@@ -75,7 +75,7 @@ public class RoomTypeService {
 
 	public ResponseEntity<?> findAll(HttpServletRequest request) {
 		try {
-			List<RoomType> roomTypes = roomTypeRepository.findAll();
+			List<RoomType> roomTypes = roomTypeRepository.findAllRoomType();
 			List<RoomTypeResponse> roomTypeResponses = new ArrayList<RoomTypeResponse>();
 			for (RoomType roomType : roomTypes) {
 				RoomTypeResponse roomTypeResponse = new RoomTypeResponse(roomType.getTypeId(), roomType.getTypeName(),
@@ -93,7 +93,7 @@ public class RoomTypeService {
 
 	public ResponseEntity<?> findById(int id, HttpServletRequest request) {
 		try {
-			Optional<RoomType> roomType = roomTypeRepository.findById(id);
+			Optional<RoomType> roomType = roomTypeRepository.findByTypeId(id);
 			if (!roomType.isPresent()) {
 				logger.info("Client " + request.getRemoteAddr() + ": " + "Room type doesn't exist!");
 				return new ResponseEntity<Object>(new ApiResponse(false, "Room type doesn't exist!"),
@@ -112,7 +112,7 @@ public class RoomTypeService {
 
 	public ResponseEntity<?> updateById(int id, RoomTypeRequest roomTypeRequest, HttpServletRequest request) {
 		try {
-			RoomType roomType = roomTypeRepository.findByTypeId(id);
+			RoomType roomType = roomTypeRepository.findByTypeId(id).get();
 			if (roomType == null) {
 				logger.info("Client " + request.getRemoteAddr() + ": " + "Room type doesn't exist!");
 				return new ResponseEntity<Object>(new ApiResponse(false, "Room type doesn't exist!"),
@@ -157,7 +157,7 @@ public class RoomTypeService {
 			boolean deleteRoomType = deleteRoomTypeById(id);
 			MessageResponse messageResponse = null;
 			if (!deleteRoomType) {
-				logger.info("Client " + request.getRemoteAddr() + ": " + "Update room type " + id + " unsuccessfully!");
+				logger.info("Client " + request.getRemoteAddr() + ": " + "delete room type " + id + " unsuccessfully!");
 				messageResponse = new MessageResponse("Room type doesn't exist or used!", 404);
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponse);
 			}
@@ -171,18 +171,18 @@ public class RoomTypeService {
 	}
 
 	private boolean deleteRoomTypeById(int id) {
-		RoomType roomType = roomTypeRepository.findByTypeId(id);
+		RoomType roomType = roomTypeRepository.findByTypeId(id).get();
 
 		if (roomType != null) {
 			boolean checkExitRoom = roomRepository.existsByRoomType(roomType);
-			System.out.println("Check: " + checkExitRoom);
 			if (!checkExitRoom) {
 				roomTypeRepository.delete(roomType);
-				return !checkExitRoom;
+				return true;
+			}else {
+				return false;
+//				roomType.setDelete(true);
+//				roomTypeRepository.save(roomType);
 			}
-
-			return !checkExitRoom;
-
 		}
 
 		return false;

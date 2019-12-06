@@ -6,7 +6,7 @@ public class BillDetailRequest {
 	int foodId;
 	int number;
 	
-	public BillDetailRequest(int billId, int foodId, int number, double unitPrice) {
+	public BillDetailRequest(int billId, int foodId, int number) {
 		super();
 		this.billId = billId;
 		this.foodId = foodId;

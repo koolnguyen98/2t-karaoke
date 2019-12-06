@@ -21,19 +21,22 @@ public class RoomType {
 	@Id
     @GeneratedValue
     @Column(name = "id")
-	int typeId;
+	private int typeId;
 	
 	@NotNull
 	@Size(max = 65)
 	@Column(name = "type_name", nullable = false)
-	String typeName;
+	private String typeName;
 	
 	@NotNull
 	@Column(name = "price", nullable = false)
-	int price;
+	private int price;
 	
 	@OneToMany(mappedBy="roomType",cascade=CascadeType.ALL, fetch = FetchType.LAZY)    
 	private List<Room> room = new ArrayList<Room>();
+	
+	@Column(name = "is_delete", nullable = false, columnDefinition = "boolean default false")
+	private boolean isDelete;
 
 	public RoomType(@NotNull String typeName, @NotNull int price) {
 		super();
@@ -75,6 +78,14 @@ public class RoomType {
 
 	public void setRoom(List<Room> room) {
 		this.room = room;
+	}
+
+	public boolean isDelete() {
+		return isDelete;
+	}
+
+	public void setDelete(boolean isDelete) {
+		this.isDelete = isDelete;
 	}
 	
 }

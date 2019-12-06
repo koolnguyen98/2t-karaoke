@@ -2,6 +2,7 @@ package com.karaoke.management.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import com.karaoke.management.api.response.ApiResponse;
 import com.karaoke.management.api.response.Response;
 import com.karaoke.management.api.response.RoomResponse;
 import com.karaoke.management.api.response.RoomTypeResponse;
+import com.karaoke.management.entity.Bill;
 import com.karaoke.management.entity.Room;
 import com.karaoke.management.entity.RoomType;
 import com.karaoke.management.reponsitory.BillRepository;
@@ -66,14 +68,21 @@ public class RoomService {
 			Room room = roomRepository.findByRoomId(id);
 			if (room != null) {
 				boolean checkExitBill = billRepository.existsByRoom(room);
-
 				if (!checkExitBill) {
 					roomRepository.delete(room);
-					logger.info("Client " + request.getRemoteAddr() + ": " + "Delete room " + id + " successfully");
-					return new ResponseEntity<Object>(new ApiResponse(false, "Delete Room Access"), HttpStatus.OK);
+				} else {
+					Optional<Bill> checkBillSuccess = billRepository.checkBillSuccess(id);
+					if(!checkBillSuccess.isPresent()) {
+						room.setDelete(true);
+						roomRepository.save(room);
+						logger.info("Client " + request.getRemoteAddr() + ": " + "Delete room " + id + " successfully");
+						return new ResponseEntity<Object>(new ApiResponse(false, "Delete Room Access"), HttpStatus.OK);
+					}
+					logger.info("Client " + request.getRemoteAddr() + ": " + "Delete room " + id + " unsuccessfully");
+					return new ResponseEntity<Object>(new ApiResponse(false, "Room does not exist"), HttpStatus.NOT_FOUND);
 				}
-				logger.info("Client " + request.getRemoteAddr() + ": " + "Delete room " + id + " unsuccessfully");
-				return new ResponseEntity<Object>(new ApiResponse(false, "Could't delete room!"), HttpStatus.NOT_FOUND);
+				logger.info("Client " + request.getRemoteAddr() + ": " + "Delete room " + id + " successfully");
+				return new ResponseEntity<Object>(new ApiResponse(false, "Delete Room Access"), HttpStatus.OK);
 			}
 			logger.info("Client " + request.getRemoteAddr() + ": " + "Delete room " + id + " unsuccessfully");
 			return new ResponseEntity<Object>(new ApiResponse(false, "Room does not exist"), HttpStatus.NOT_FOUND);
@@ -115,7 +124,7 @@ public class RoomService {
 
 	public ResponseEntity<?> findAll(HttpServletRequest request) {
 		try {
-			List<Room> listRoom = roomRepository.findAll();
+			List<Room> listRoom = roomRepository.findAllRoom();
 			if (listRoom != null) {
 				List<Response> roomResponses = new ArrayList<Response>();
 				for (Room room : listRoom) {
@@ -167,9 +176,9 @@ public class RoomService {
 
 	private Room saveRoom(RoomRequest roomRequest) {
 
-		RoomType roomType = roomTypeRepository.findByTypeId(roomRequest.getRoomTypeId());
-		if (roomType != null) {
-			Room room = new Room(roomRequest.getRoomName(), roomType, roomRequest.getStatus());
+		Optional<RoomType> roomType = roomTypeRepository.findByTypeId(roomRequest.getRoomTypeId());
+		if (roomType.isPresent()) {
+			Room room = new Room(roomRequest.getRoomName(), roomType.get(), roomRequest.getStatus());
 			Room result = roomRepository.save(room);
 			return result;
 		}
@@ -208,7 +217,7 @@ public class RoomService {
 	private Room updateRoomType(Room room, int idRoomType) {
 
 		if (roomTypeRepository.existsById(idRoomType)) {
-			room.setRoomType(roomTypeRepository.findByTypeId(idRoomType));
+			room.setRoomType(roomTypeRepository.findByTypeId(idRoomType).get());
 		}
 
 		return room;

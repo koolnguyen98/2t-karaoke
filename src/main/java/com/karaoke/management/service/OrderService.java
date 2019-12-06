@@ -113,7 +113,7 @@ public class OrderService {
 		}
 	}
 
-	public ResponseEntity<?> addBillDetailRequest(int id, @Valid BillDetailRequest billDetailRequest, HttpServletRequest request) {
+	public ResponseEntity<?> addBillDetailRequest(int id, BillDetailRequest billDetailRequest, HttpServletRequest request) {
 		try {
 			if (roomRepository.existsByRoomIdAndStatus(id, 1)) {
 				Room room = roomRepository.findByRoomId(id);
