@@ -72,7 +72,7 @@ public class FileStorageService {
 		if(food != null) {
 			fileName = food.getImgLink();
 		}
-		File fi = new File("D:/chong/UngDung/eclipse/eclipse-workspase/KaraokeManagement/src/main/resources/image/food/"+ fileName);
+		File fi = new File(this.fileStorageLocation.resolve(fileName).toString());
 		byte[] bytes = null;
 		try {
 			bytes = Files.readAllBytes(fi.toPath());
