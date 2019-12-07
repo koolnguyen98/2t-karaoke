@@ -116,9 +116,15 @@ public class OrderService {
 	public ResponseEntity<?> addBillDetailRequest(int id, BillDetailRequest billDetailRequest, HttpServletRequest request) {
 		try {
 			if (roomRepository.existsByRoomIdAndStatus(id, 1)) {
-				Room room = roomRepository.findByRoomId(id);
-				addBillDetailToOrderReponse(room, billDetailRequest, request);
-				return findBillByRoom(id, request);
+				if(foodRepository.existsById(billDetailRequest.getFoodId())) {
+					Room room = roomRepository.findByRoomId(id);
+					addBillDetailToOrderReponse(room, billDetailRequest, request);
+					return findBillByRoom(id, request);
+				}else {
+					logger.info("Client " + request.getRemoteAddr() + ": " + "Add bill detail by room " + id + " unsuccessfully: Food doesn't exits!");
+					return new ResponseEntity<Object>(new ApiResponse(false, "Food doesn't exits!"),
+							HttpStatus.BAD_REQUEST);
+				}
 			}
 			logger.info("Client " + request.getRemoteAddr() + ": " + "Add bill detail by room " + id + " unsuccessfully");
 			return new ResponseEntity<Object>(new ApiResponse(false, "Room doesn't exist or room uncheckin!"),
@@ -151,7 +157,7 @@ public class OrderService {
 	public ResponseEntity<?> deleteBillDetail(int id, @Valid BillDetailRequest billDetailRequest, HttpServletRequest request) {
 		try {
 			if (roomRepository.existsByRoomIdAndStatus(id, 1)) {
-				boolean checkDeleteBillDetail = deleteBillDetail(billDetailRequest);
+				boolean checkDeleteBillDetail = deleteBillDetail(billDetailRequest, id);
 				if (checkDeleteBillDetail) {
 					return findBillByRoom(id, request);
 				}
@@ -193,14 +199,14 @@ public class OrderService {
 		}
 	}
 
-	private boolean deleteBillDetail(@Valid BillDetailRequest billDetailRequest) {
-		Bill bill = billRepository.findByBillId(billDetailRequest.getBillId());
+	private boolean deleteBillDetail(BillDetailRequest billDetailRequest, int roomId) {
+		Optional<Bill> bill = billRepository.checkBillSuccess(roomId);
 		Food food = foodRepository.findByFoodId(billDetailRequest.getFoodId());
-		if (checkBillAndFoodExist(bill, food)) {
+		if (checkBillAndFoodExist(bill.get(), food)) {
 			try {
-				BillDetails billDetails = billDetailsRepository.findByBillAndFood(bill, food);
+				BillDetails billDetails = billDetailsRepository.findByBillAndFood(bill.get(), food);
 				billDetailsRepository.delete(billDetails);
-				updateTotalPrice(bill);
+				updateTotalPrice(bill.get());
 			} catch (Exception e) {
 				return false;
 			}
@@ -383,15 +389,15 @@ public class OrderService {
 	}
 
 	private void addBillDetailToOrderReponse(Room room, @Valid BillDetailRequest billDetailRequest, HttpServletRequest request) {
-		Bill bill = billRepository.findByBillId(billDetailRequest.getBillId());
+		Optional<Bill> opBill = billRepository.checkBillSuccess(room.getRoomId());
 		Food food = foodRepository.findByFoodId(billDetailRequest.getFoodId());
-		if (bill != null) {
+		if (opBill.isPresent()) {
+			Bill bill = opBill.get();
 			if (food != null) {
-				boolean checkAddBillDetail = addBillDetail(billDetailRequest, request);
+				boolean checkAddBillDetail = addBillDetail(billDetailRequest, bill, request);
 
 				if (checkAddBillDetail) {
 					bill = updateTotalPrice(bill);
-					bill = billRepository.findByBillId(billDetailRequest.getBillId());
 				}
 			}
 		} else {
@@ -400,14 +406,13 @@ public class OrderService {
 		}
 	}
 
-	private boolean addBillDetail(@Valid BillDetailRequest billDetailRequest, HttpServletRequest request) {
+	private boolean addBillDetail(@Valid BillDetailRequest billDetailRequest, Bill bill, HttpServletRequest request) {
 		try {
 			Optional<Food> food = foodRepository.findById(billDetailRequest.getFoodId());
-			Bill bill = billRepository.findByBillId(billDetailRequest.getBillId());
 			BillDetails billDetails = billDetailsRepository.findByBillAndFood(bill, food.get());
 			int number = billDetailRequest.getNumber();
 			if (billDetails == null) {
-				BillDetailsKey billDetailsKey = new BillDetailsKey(billDetailRequest.getBillId(),
+				BillDetailsKey billDetailsKey = new BillDetailsKey(bill.getBillId(),
 						billDetailRequest.getFoodId());
 				billDetails = new BillDetails(billDetailsKey);
 				if (number <= 0) {
