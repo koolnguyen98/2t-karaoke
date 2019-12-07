@@ -36,7 +36,7 @@ public class Food {
 	@Column(name = "price", nullable = false)
 	private double price;
 	
-	@Column(name = "image_url", columnDefinition = "varchar(255) default '/src/main/resources/image/food/default.jpg'")
+	@Column(name = "image_url", columnDefinition = "varchar(255) default 'default.png'")
 	@Size(max = 255)
 	private  String imgLink;
 	
