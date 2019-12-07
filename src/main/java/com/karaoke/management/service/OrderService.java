@@ -190,7 +190,7 @@ public class OrderService {
 				}
 			} else {
 				logger.info("Client " + request.getRemoteAddr() + ": " + "Checkout by room " + roomId + " unsuccessfully");
-				messageResponse = new MessageResponse("Room not exist or room can't checkout in", 404);
+				messageResponse = new MessageResponse("Room does not exist or room uncheckin", 404);
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponse);
 			}
 		} catch (Exception e) {

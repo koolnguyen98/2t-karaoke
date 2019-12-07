@@ -35,7 +35,7 @@ public class ReportService {
 			List<DateReport> billReports = new ArrayList<DateReport>();
 			LocalDateTime startDate = fromDate;
 			LocalDateTime endDate = startDate.plusDays(1).minusSeconds(1);
-			while (endDate.compareTo(toDate) <= 0) {
+			while (startDate.compareTo(toDate) <= 0) {
 				bills = getBillFromTo(startDate, endDate);
 
 				DateReport billReport = createBillReport(bills, startDate, endDate);
@@ -120,8 +120,8 @@ public class ReportService {
 
 	private DateReport createBillReport(List<Bill> bills, LocalDateTime startDate, LocalDateTime endDate) {
 		DateReport billReport = new DateReport();
-		billReport.setStartDate(startDate);
-		billReport.setEndDate(endDate);
+		billReport.setStartDate(startDate.toString());
+		billReport.setEndDate(endDate.toString());
 		billReport.setBills(bills);
 		billReport.setTotalBillInDay(bills.size());
 		billReport.setTotalInDay(countTotalInDay(bills));

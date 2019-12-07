@@ -7,23 +7,23 @@ import com.karaoke.management.entity.Bill;
 
 public class DateReport {
 	
-	LocalDateTime startDate;
+	String startDate;
 	
-	LocalDateTime endDate;
+	String endDate;
 	
-	public LocalDateTime getStartDate() {
+	public String getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(LocalDateTime startDate) {
+	public void setStartDate(String startDate) {
 		this.startDate = startDate;
 	}
 
-	public LocalDateTime getEndDate() {
+	public String getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(LocalDateTime endDate) {
+	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
 
@@ -33,7 +33,7 @@ public class DateReport {
 	
 	List<Bill> bills;
 	
-	public DateReport(LocalDateTime startDate, LocalDateTime endDate, int totalBillInDay, double totalInDay,
+	public DateReport(String startDate, String endDate, int totalBillInDay, double totalInDay,
 			List<Bill> bills) {
 		super();
 		this.startDate = startDate;

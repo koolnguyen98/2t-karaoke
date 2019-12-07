@@ -11,6 +11,10 @@ public class RoomTypeRequest {
 		this.price = price;
 	}
 	
+	public RoomTypeRequest() {
+		super();
+	}
+
 	public String getTypeName() {
 		return typeName;
 	}
