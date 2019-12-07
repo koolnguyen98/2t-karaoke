@@ -81,19 +81,19 @@ public class ImportDatabaseService {
 
 	private void improtFood() {
 		List<Food> foods = new ArrayList<Food>();
-		Food food1 = new Food("Spring water", "Bottle", 15000);
+		Food food1 = new Food("Spring water", "Bottle", 15000, "default.png");
 		foods.add(food1);
 		
-		Food food2 = new Food("Tiger Beer", "Bottle", 25000);
+		Food food2 = new Food("Tiger Beer", "Bottle", 25000, "default.png");
 		foods.add(food2);
 		
-		Food food3 = new Food("Mix Fruits", "Dishes", 150000);
+		Food food3 = new Food("Mix Fruits", "Dishes", 150000, "default.png");
 		foods.add(food3);
 		
-		Food food4 = new Food("Snack", "Bags", 15000);
+		Food food4 = new Food("Snack", "Bags", 15000, "default.png");
 		foods.add(food4);
 		
-		Food food5 = new Food("CocaCola", "Bottle", 20000);
+		Food food5 = new Food("CocaCola", "Bottle", 20000, "default.png");
 		foods.add(food5);
 		
 		for (Food food : foods) {
