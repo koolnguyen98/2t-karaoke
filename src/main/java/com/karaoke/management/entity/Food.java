@@ -36,7 +36,7 @@ public class Food {
 	@Column(name = "price", nullable = false)
 	private double price;
 	
-	@Column(name = "image_url", columnDefinition = "varchar(255) default '\\src\\main\\resources\\image\\food\\default.jpg'")
+	@Column(name = "image_url", columnDefinition = "varchar(255) default '/src/main/resources/image/food/default.jpg'")
 	@Size(max = 255)
 	private  String imgLink;
 	
@@ -55,6 +55,14 @@ public class Food {
 
 	public Food() {
 		super();
+	}
+
+	public Food(String eatingName, String unit, double price, String imageLink) {
+		super();
+		this.eatingName = eatingName;
+		this.unit = unit;
+		this.price = price;
+		this.imgLink = imageLink;
 	}
 
 	public int getFoodId() {
@@ -104,9 +112,13 @@ public class Food {
 	public void setDelete(boolean isDelete) {
 		this.isDelete = isDelete;
 	}
-	
-	public static void main(String[] agrs) {
-		
+
+	public String getImgLink() {
+		return imgLink;
 	}
 
+	public void setImgLink(String imgLink) {
+		this.imgLink = imgLink;
+	}
+	
 }

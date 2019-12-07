@@ -7,10 +7,12 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.karaoke.management.api.WriterLog;
 import com.karaoke.management.api.request.FoodRequest;
@@ -23,6 +25,7 @@ import com.karaoke.management.entity.Food;
 import com.karaoke.management.reponsitory.BillDetailsRepository;
 import com.karaoke.management.reponsitory.BillRepository;
 import com.karaoke.management.reponsitory.FoodRepository;
+import com.karaoke.management.service.helper.FileStorageService;
 
 @Service
 public class FoodService {
@@ -36,6 +39,9 @@ public class FoodService {
 	@Autowired
 	BillRepository billRepository;
 	
+	@Autowired
+    private FileStorageService fileStorageService;
+	
 	Logger logger = WriterLog.getLogger(FoodService.class.toString());
 
 	public ResponseEntity<?> findAll(HttpServletRequest request) {
@@ -45,6 +51,7 @@ public class FoodService {
 			for (Food food : listfood) {
 				FoodResponse foodResponse = new FoodResponse(food.getFoodId(), food.getEatingName(), food.getUnit(),
 						food.getPrice());
+				foodResponse.setImageBase64(new String(fileStorageService.getImage(food.getFoodId()), "UTF-8"));
 				listfoodResponses.add(foodResponse);
 			}
 			logger.info("Client " + request.getRemoteAddr() + ": " + "Get all food successfully");
@@ -65,6 +72,7 @@ public class FoodService {
 	        } else {
 	        	logger.info("Client " + request.getRemoteAddr() + ": " + "Get food by " + id + " successfully");
 		    	FoodResponse foodResponse = new FoodResponse(food.getFoodId(), food.getEatingName(), food.getUnit(), food.getPrice());
+		    	foodResponse.setImageBase64(new String(fileStorageService.getImage(food.getFoodId()), "UTF-8"));
 		    	return ResponseEntity.ok(foodResponse);
 	        }
 		} catch (Exception e) {
@@ -74,7 +82,7 @@ public class FoodService {
 
 	}
 	
-	public ResponseEntity<?> updateById(int id, FoodRequest foodRequest, HttpServletRequest request) {
+	public ResponseEntity<?> updateById(int id, FoodRequest foodRequest, HttpServletRequest request, MultipartFile file) {
 		try {
 			Food food = foodRepository.findByFoodId(id);
 	        if (food == null) {
@@ -98,11 +106,12 @@ public class FoodService {
 		            return new ResponseEntity<Object>(new ApiResponse(false, "Price > 0!"),
 		                    HttpStatus.BAD_REQUEST);
 		        }
-		    	Food updatedfood = updateFoodById(food, foodRequest);
+		    	Food updatedfood = updateFoodById(food, foodRequest, file);
 	        	FoodResponse foodResponse = new FoodResponse(updatedfood.getFoodId(), 
 	        			updatedfood.getEatingName(), 
 	        			updatedfood.getUnit(), 
 	        			updatedfood.getPrice());
+	        	foodResponse.setImageBase64(new String(fileStorageService.getImage(food.getFoodId()), "UTF-8"));
 	        	logger.info("Client " + request.getRemoteAddr() + ": " + "Update food successfully!");
 	            return ResponseEntity.ok(foodResponse);
 	        }
@@ -131,7 +140,7 @@ public class FoodService {
 
 	}
 	
-	public ResponseEntity<?> create(FoodRequest foodRequest, HttpServletRequest request) {
+	public ResponseEntity<?> create(FoodRequest foodRequest, HttpServletRequest request, MultipartFile file) {
 		try {
 			if(foodRepository.existsByEatingName(foodRequest.getEatingName())) {
 				logger.info("Client " + request.getRemoteAddr() + ": " + "Update food Eating name is already taken!");
@@ -151,7 +160,7 @@ public class FoodService {
 	                    HttpStatus.BAD_REQUEST);
 	        }
 	    	
-	        Food createdfood = createFood(foodRequest);
+	        Food createdfood = createFood(foodRequest, file);
 	        if (createdfood == null) {
 	        	logger.info("Client " + request.getRemoteAddr() + ": " + "Create food by unsuccessfully!");
 	        	return new ResponseEntity<Object>(new ApiResponse(false, "Cann't creat dishes!"), HttpStatus.NOT_FOUND);
@@ -161,6 +170,7 @@ public class FoodService {
 	            		createdfood.getEatingName(), 
 	            		createdfood.getUnit(), 
 	            		createdfood.getPrice());
+	            foodResponse.setImageBase64(new String(fileStorageService.getImage(createdfood.getFoodId()), "UTF-8"));
 	            logger.info("Client " + request.getRemoteAddr() + ": " + "Create food by successfully!");
 				return ResponseEntity.ok(foodResponse);
 	        }
@@ -171,16 +181,23 @@ public class FoodService {
 
 	}
 
-	private Food createFood(@Valid FoodRequest foodRequest) {
+	private Food createFood(@Valid FoodRequest foodRequest, MultipartFile file) {
 		Food food = foodRepository.findByEatingName(foodRequest.getEatingName());
 		if (food == null) {
-
 			Food createdfood = new Food(foodRequest.getEatingName(), foodRequest.getUnit(), foodRequest.getPrice());
 			Food result = foodRepository.save(createdfood);
-
+			String imageLink = coppyImage(file, result.getFoodId());
+			result.setImgLink(imageLink);
+			result = foodRepository.save(result);
 			return result;
 		}
 		return null;
+	}
+
+	private String coppyImage(MultipartFile file, int id) {
+		String fileName = fileStorageService.storeFile(file, id);
+
+        return fileName;
 	}
 
 	private boolean deleteFoodById(int id) {
@@ -209,7 +226,7 @@ public class FoodService {
 		return false;
 	}
 
-	private Food updateFoodById(Food food, FoodRequest foodRequest) {
+	private Food updateFoodById(Food food, FoodRequest foodRequest, MultipartFile file) {
 		
 		if (foodRequest.getEatingName() != null && foodRequest.getEatingName() != "") {
 			food.setEatingName(foodRequest.getEatingName());
@@ -220,8 +237,12 @@ public class FoodService {
 		if (foodRequest.getPrice() != -1) {
 			food.setPrice(foodRequest.getPrice());
 		}
+		if (!file.isEmpty() && file != null) {
+			String imageLink = coppyImage(file, food.getFoodId());
+			food.setImgLink(imageLink);
+		}
 		Food result = foodRepository.save(food);
-
+		
 		return result;
 	}
 

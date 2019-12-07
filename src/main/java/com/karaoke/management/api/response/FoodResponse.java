@@ -10,6 +10,8 @@ public class FoodResponse {
 	
 	double price;
 	
+	String imageBase64;
+	
 	public FoodResponse() {
 		super();
 	}
@@ -54,4 +56,12 @@ public class FoodResponse {
 		this.price = price;
 	}
 
+	public String getImageBase64() {
+		return imageBase64;
+	}
+
+	public void setImageBase64(String imageBase64) {
+		this.imageBase64 = imageBase64;
+	}
+	
 }
