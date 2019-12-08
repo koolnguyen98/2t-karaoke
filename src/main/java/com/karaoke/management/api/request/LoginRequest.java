@@ -9,12 +9,22 @@ public class LoginRequest {
     @NotBlank
     private String password;
 
-    public String getUsername() {
+    public LoginRequest() {
+		super();
+	}
+
+	public LoginRequest(@NotBlank String username, @NotBlank String password) {
+		super();
+		this.username = username.trim();
+		this.password = password.trim();
+	}
+
+	public String getUsername() {
         return username;
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.username = username.trim();
     }
 
     public String getPassword() {
@@ -22,6 +32,6 @@ public class LoginRequest {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = password.trim();
     }
 }

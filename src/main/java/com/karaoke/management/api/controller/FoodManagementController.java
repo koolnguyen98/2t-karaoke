@@ -1,25 +1,19 @@
 package com.karaoke.management.api.controller;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,7 +25,6 @@ import com.karaoke.management.api.request.FoodRequest;
 import com.karaoke.management.api.response.ApiResponse;
 import com.karaoke.management.reponsitory.FoodRepository;
 import com.karaoke.management.service.FoodService;
-import com.karaoke.management.service.helper.FileStorageService;
 
 @RestController
 public class FoodManagementController {
@@ -41,9 +34,6 @@ public class FoodManagementController {
 
 	@Autowired
 	FoodService foodService;
-	
-	@Autowired
-    private FileStorageService fileStorageService;
 
 	@GetMapping(value = Urls.API_FOOD_FIND_ALL)
 	public ResponseEntity<?> findAll(HttpServletRequest request) {
@@ -56,7 +46,7 @@ public class FoodManagementController {
 	}
 
 	@PutMapping(value = Urls.API_FOOD_UPDATE_BY_ID)
-	public ResponseEntity<?> updatefood(@RequestParam("food") String food, @PathVariable int id, HttpServletRequest request, @RequestParam(value = "file", required = false) Optional<MultipartFile> file) {
+	public ResponseEntity<?> updatefood(@RequestParam("food") String food, @PathVariable int id, HttpServletRequest request, @RequestParam(value = "file", required = false) MultipartFile file) {
 		FoodRequest foodRequest = null;
 		try {
 			foodRequest = new ObjectMapper().readValue(food, FoodRequest.class);
@@ -70,7 +60,7 @@ public class FoodManagementController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return foodService.updateById(id, foodRequest, request, file.get());
+		return foodService.updateById(id, foodRequest, request, file);
 	}
 
 	@PostMapping(value = Urls.API_FOOD_DELETE_BY_ID)
@@ -80,7 +70,7 @@ public class FoodManagementController {
 	}
 
 	@PostMapping(value = Urls.API_FOOD_CREATE)
-	public ResponseEntity<?> create(@Valid @RequestParam("food") String food, HttpServletRequest request, @RequestParam(value = "file") MultipartFile file) throws URISyntaxException {
+	public ResponseEntity<?> create(@Valid @RequestParam("food") String food, HttpServletRequest request, @RequestParam(value = "file", required = false) MultipartFile file) throws URISyntaxException {
 		FoodRequest foodRequest = null;
 		try {
 			foodRequest = new ObjectMapper().readValue(food, FoodRequest.class);
@@ -94,7 +84,7 @@ public class FoodManagementController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if(foodRequest != null && !file.isEmpty()) {
+		if(foodRequest != null) {
 			return foodService.create(foodRequest, request, file);
 		}
 		return new ResponseEntity<Object>(new ApiResponse(false, "Please fill all information"), HttpStatus.BAD_REQUEST);

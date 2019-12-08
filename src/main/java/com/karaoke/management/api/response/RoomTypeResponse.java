@@ -9,7 +9,7 @@ public class RoomTypeResponse implements Response {
 	public RoomTypeResponse(int typeId, String typeName, int price) {
 		super();
 		this.typeId = typeId;
-		this.typeName = typeName;
+		this.typeName = typeName.trim();
 		this.price = price;
 	}
 	
@@ -26,7 +26,7 @@ public class RoomTypeResponse implements Response {
 	}
 	
 	public void setTypeName(String typeName) {
-		this.typeName = typeName;
+		this.typeName = typeName.trim();
 	}
 	
 	public int getPrice() {

@@ -19,8 +19,8 @@ public class FoodResponse {
 	public FoodResponse(int foodId, String eatingName, String unit, double price) {
 		super();
 		this.foodId = foodId;
-		this.eatingName = eatingName;
-		this.unit = unit;
+		this.eatingName = eatingName.trim();
+		this.unit = unit.trim();
 		this.price = price;
 	}
 
@@ -37,7 +37,7 @@ public class FoodResponse {
 	}
 
 	public void setEatingName(String eatingName) {
-		this.eatingName = eatingName;
+		this.eatingName = eatingName.trim();
 	}
 
 	public String getUnit() {
@@ -45,7 +45,7 @@ public class FoodResponse {
 	}
 
 	public void setUnit(String unit) {
-		this.unit = unit;
+		this.unit = unit.trim();
 	}
 
 	public double getPrice() {

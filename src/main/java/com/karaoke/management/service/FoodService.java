@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -89,7 +88,7 @@ public class FoodService {
 	        	logger.info("Client " + request.getRemoteAddr() + ": " + "Update food unsuccessfully");
 	        	return new ResponseEntity<Object>(new ApiResponse(false, "Dishes doesn't exist!"), HttpStatus.NOT_FOUND);
 	        } else {
-	        	if(foodRepository.existsByEatingName(foodRequest.getEatingName()) || foodRequest.getEatingName() == "" || foodRequest.getEatingName() == null) {
+	        	if(foodRepository.existsByEatingName(foodRequest.getEatingName(), id).size() != 0|| foodRequest.getEatingName() == "" || foodRequest.getEatingName() == null) {
 	        		logger.info("Client " + request.getRemoteAddr() + ": " + "Update food Eating name is already taken!");
 	        		return new ResponseEntity<Object>(new ApiResponse(false, "Eating name is already taken!"),
 		                    HttpStatus.BAD_REQUEST);
@@ -186,8 +185,12 @@ public class FoodService {
 		if (food == null) {
 			Food createdfood = new Food(foodRequest.getEatingName(), foodRequest.getUnit(), foodRequest.getPrice());
 			Food result = foodRepository.save(createdfood);
-			String imageLink = coppyImage(file, result.getFoodId());
-			result.setImgLink(imageLink);
+			if(file != null) {
+				String imageLink = coppyImage(file, result.getFoodId());
+				result.setImgLink(imageLink);
+			}else {
+				result.setImgLink("default.png");
+			}
 			result = foodRepository.save(result);
 			return result;
 		}
@@ -227,7 +230,6 @@ public class FoodService {
 	}
 
 	private Food updateFoodById(Food food, FoodRequest foodRequest, MultipartFile file) {
-		
 		if (foodRequest.getEatingName() != null && foodRequest.getEatingName() != "") {
 			food.setEatingName(foodRequest.getEatingName());
 		}
@@ -237,12 +239,11 @@ public class FoodService {
 		if (foodRequest.getPrice() != -1) {
 			food.setPrice(foodRequest.getPrice());
 		}
-		if (!file.isEmpty() && file != null) {
+		if (file != null) {
 			String imageLink = coppyImage(file, food.getFoodId());
 			food.setImgLink(imageLink);
 		}
 		Food result = foodRepository.save(food);
-		
 		return result;
 	}
 

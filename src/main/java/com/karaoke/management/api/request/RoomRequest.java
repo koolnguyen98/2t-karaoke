@@ -1,7 +1,12 @@
 package com.karaoke.management.api.request;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 public class RoomRequest {
 
+	@NotBlank
+    @Size(max = 100)
 	String roomName;
 	 
 	int roomTypeId = -1;
@@ -10,7 +15,7 @@ public class RoomRequest {
 
 	public RoomRequest(String roomName, int roomTypeId, int status) {
 		super();
-		this.roomName = roomName;
+		this.roomName = roomName.trim();
 		this.roomTypeId = roomTypeId;
 		this.status = status;
 	}
@@ -24,7 +29,7 @@ public class RoomRequest {
 	}
 
 	public void setRoomName(String roomName) {
-		this.roomName = roomName;
+		this.roomName = roomName.trim();
 	}
 
 	public int getRoomTypeId() {

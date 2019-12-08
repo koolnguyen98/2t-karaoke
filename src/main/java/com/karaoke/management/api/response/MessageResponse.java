@@ -8,7 +8,7 @@ public class MessageResponse {
 
 	public MessageResponse(String message, int code) {
 		super();
-		Message = message;
+		Message = message.trim();
 		this.code = code;
 	}
 	
@@ -21,7 +21,7 @@ public class MessageResponse {
 	}
 
 	public void setMessage(String message) {
-		Message = message;
+		Message = message.trim();
 	}
 
 	public int getCode() {

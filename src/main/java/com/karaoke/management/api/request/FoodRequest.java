@@ -1,16 +1,23 @@
 package com.karaoke.management.api.request;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 public class FoodRequest {
 
+	@NotBlank
+    @Size(max = 100)
 	String eatingName;
 	
+	@NotBlank
+    @Size(max = 50)
 	String unit;
 	
 	double price = -1;
 
 	public FoodRequest(String eatingName, String unit, double price) {
 		super();
-		this.eatingName = eatingName;
+		this.eatingName = eatingName.trim();
 		this.unit = unit;
 		this.price = price;
 	}
@@ -24,7 +31,7 @@ public class FoodRequest {
 	}
 
 	public void setEatingName(String eatingName) {
-		this.eatingName = eatingName;
+		this.eatingName = eatingName.trim();
 	}
 
 	public String getUnit() {
@@ -32,7 +39,7 @@ public class FoodRequest {
 	}
 
 	public void setUnit(String unit) {
-		this.unit = unit;
+		this.unit = unit.trim();
 	}
 
 	public double getPrice() {

@@ -13,7 +13,7 @@ public class RoomResponse implements Response {
 	public RoomResponse(int roomId, String roomName, RoomTypeResponse roomTypeResponse, int status) {
 		super();
 		this.roomId = roomId;
-		this.roomName = roomName;
+		this.roomName = roomName.trim();
 		this.roomTypeResponse = roomTypeResponse;
 		this.status = status;
 	}
@@ -35,7 +35,7 @@ public class RoomResponse implements Response {
 	}
 
 	public void setRoomName(String roomName) {
-		this.roomName = roomName;
+		this.roomName = roomName.trim();
 	}
 
 	public RoomTypeResponse getRoomTypeResponse() {

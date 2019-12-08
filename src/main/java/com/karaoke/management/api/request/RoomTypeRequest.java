@@ -1,13 +1,18 @@
 package com.karaoke.management.api.request;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 public class RoomTypeRequest {
 
+	@NotBlank
+    @Size(max = 100)
 	String typeName;
 	int price;
 	
 	public RoomTypeRequest(String typeName, int price) {
 		super();
-		this.typeName = typeName;
+		this.typeName = typeName.trim();
 		this.price = price;
 	}
 	
@@ -20,7 +25,7 @@ public class RoomTypeRequest {
 	}
 	
 	public void setTypeName(String typeName) {
-		this.typeName = typeName;
+		this.typeName = typeName.trim();
 	}
 	
 	public int getPrice() {

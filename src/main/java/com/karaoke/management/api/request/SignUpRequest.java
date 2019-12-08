@@ -16,12 +16,24 @@ public class SignUpRequest {
     @Size(max = 100)
     private String name;
 
-    public String getName() {
+    public SignUpRequest() {
+		super();
+	}
+
+	public SignUpRequest(@NotBlank @Size(max = 50) String username, @NotBlank @Size(max = 100) String password,
+			@NotBlank @Size(max = 100) String name) {
+		super();
+		this.username = username.trim();
+		this.password = password.trim();
+		this.name = name.trim();
+	}
+
+	public String getName() {
         return name;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.trim();
     }
 
     public String getUsername() {
@@ -29,7 +41,7 @@ public class SignUpRequest {
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.username = username.trim();
     }
 
     public String getPassword() {
@@ -37,6 +49,6 @@ public class SignUpRequest {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = password.trim();
     }
 }
