@@ -82,10 +82,11 @@ public class ReportService {
 	public ResponseEntity<?> createReportMonth(LocalDateTime dayReport, HttpServletRequest request) {
 		try {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			String month = dayReport.getMonthValue() < 10 ? "0"+dayReport.getMonthValue() : ""+dayReport.getMonthValue();
 			LocalDateTime date = LocalDateTime
-					.parse(dayReport.getYear() + "-" + dayReport.getMonthValue() + "-01 00:00:00", formatter);
+					.parse(dayReport.getYear() + "-" + month + "-01 00:00:00", formatter);
 			LocalDateTime fromDate = date;
-			LocalDateTime toDate = date.plusMonths(1);
+			LocalDateTime toDate = date.plusMonths(1).minusDays(1);
 			logger.info("Client " + request.getRemoteAddr() + ": " + "Get report " + dayReport.getMonth().toString() + " successfully");
 			return createReportFromTo(fromDate, toDate, request);
 
@@ -100,9 +101,19 @@ public class ReportService {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 			LocalDateTime date = LocalDateTime.parse(dayReport.getYear() + "-01-01 00:00:00", formatter);
 			LocalDateTime fromDate = date;
-			LocalDateTime toDate = date.plusYears(1);
+			LocalDateTime toDate = date.plusYears(1).minusDays(1);
 			logger.info("Client " + request.getRemoteAddr() + ": " + "Get report " + dayReport.getYear() + " successfully");
-			return createReportFromTo(fromDate, toDate, request);
+			LocalDateTime startDate = fromDate;
+			LocalDateTime endDate = startDate.plusMonths(1);
+			List<Report> report = new ArrayList<Report>();
+			while (startDate.compareTo(toDate) <= 0) {
+				report.add((Report) createReportMonth(startDate, request).getBody());
+				startDate = endDate;
+				endDate = startDate.plusMonths(1);
+
+			}
+			return ResponseEntity.ok(report);
+
 
 		} catch (Exception e) {
 			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
