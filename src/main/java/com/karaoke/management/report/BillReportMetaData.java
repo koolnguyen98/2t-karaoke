@@ -12,11 +12,13 @@ public class BillReportMetaData {
 	private String billId;
 	
 	private ArrayList<BillDetailReport>  billDetailReports;
+	
+	private String totalPrice;
 
 	private String seller;
 
 	public BillReportMetaData(String startDate, String endDate, String roomName, String billId,
-			ArrayList<BillDetailReport> billDetailReports, String seller) {
+			ArrayList<BillDetailReport> billDetailReports, String seller, String totalPrice) {
 		super();
 		this.startDate = startDate;
 		this.endDate = endDate;
@@ -24,6 +26,7 @@ public class BillReportMetaData {
 		this.billId = billId;
 		this.billDetailReports = billDetailReports;
 		this.seller = seller;
+		this.totalPrice = totalPrice;
 	}
 
 	public BillReportMetaData() {
@@ -77,5 +80,15 @@ public class BillReportMetaData {
 	public void setSeller(String seller) {
 		this.seller = seller;
 	}
+
+	public String getTotalPrice() {
+		return totalPrice;
+	}
+
+	public void setTotalPrice(String totalPrice) {
+		this.totalPrice = totalPrice;
+	}
+	
+	
 	
 }

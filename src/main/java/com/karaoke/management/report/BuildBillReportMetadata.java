@@ -1,6 +1,7 @@
 package com.karaoke.management.report;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class BuildBillReportMetadata {
 		billReportMetaData.setBillId(String.valueOf(bill.getBillId()));
 		billReportMetaData.setStartDate(bill.getCheckin().toString());
 		billReportMetaData.setEndDate(bill.getCheckout().toString());
+		billReportMetaData.setTotalPrice(buildUnitPrice((double)bill.getTotal()));
 		billReportMetaData.setRoomName(room.getRoomName());
 		billReportMetaData.setSeller(seller);
 		billReportMetaData.setBillDetailReports(builBillDetailReport(room, bill, billDetails));
@@ -29,14 +31,14 @@ public class BuildBillReportMetadata {
 		
 		RoomType roomType = room.getRoomType();
 		
-		billDetailReports.add(buildBillReport(roomType.getTypeName(), buildUnitPrice(roomType.getPrice()), buildNumber(bill.getCheckin(), bill.getCheckout()), buildPrice(bill.getCheckin(), bill.getCheckout(), roomType.getPrice())));
+		billDetailReports.add(buildBillReport(roomType.getTypeName(), buildUnitPrice((double)roomType.getPrice()), buildNumber(bill.getCheckin(), bill.getCheckout()), buildPrice(bill.getCheckin(), bill.getCheckout(), roomType.getPrice())));
 		
 		for (BillDetails billDetail : billDetails) {
 			BillDetailReport billDetailReport = new BillDetailReport();
-//			billDetailReport.setTypeName(typeName);
-//			billDetailReport.setUnitPrice(unitPrice);
-//			billDetailReport.setNumber(number);
-//			billDetailReport.setPrice(price);
+			billDetailReport.setTypeName(billDetail.getFood().getEatingName());
+			billDetailReport.setUnitPrice(buildUnitPrice((double)billDetail.getFood().getPrice()));
+			billDetailReport.setNumber(String.valueOf(billDetail.getNumber()));
+			billDetailReport.setPrice(buildUnitPrice(billDetail.getUnitPrice()));
 			billDetailReports.add(billDetailReport);
 		}
 		
@@ -44,16 +46,16 @@ public class BuildBillReportMetadata {
 	}
 
 	private static String buildPrice(LocalDateTime checkin, LocalDateTime checkout, int price) {
-		// TODO Auto-generated method stub
-		return null;
+		double result = calculateTimeMoney(checkin, checkout, (double)price);
+		return result < 100000.0 ? buildUnitPrice(100000.0) : buildUnitPrice(result);
 	}
 
 	private static String buildNumber(LocalDateTime checkin, LocalDateTime checkout) {
-		// TODO Auto-generated method stub
-		return null;
+		double result = calculateTime(checkin, checkout);
+		return result < 0.5 ? String.valueOf(0.5) : String.valueOf(result);
 	}
 
-	private static String buildUnitPrice(int price) {
+	private static String buildUnitPrice(double price) {
 		return String.format("%,.2f", price);
 	}
 
@@ -66,6 +68,41 @@ public class BuildBillReportMetadata {
 		billDetailReport.setPrice(price);
 		
 		return billDetailReport;
+	}
+	
+	private static double calculateTimeMoney(LocalDateTime checkinTime, LocalDateTime checkoutTime, double priceRoom) {
+
+		double result = 0;
+
+		result = (double) calculateTime(checkinTime, checkoutTime) * priceRoom;
+
+		return result;
+	}
+	
+	private static double calculateTime(LocalDateTime checkinTime, LocalDateTime checkoutTime) {
+	
+		double result = 0;
+
+		LocalDateTime tempDateTime = LocalDateTime.from(checkinTime);
+
+		long hours = tempDateTime.until(checkoutTime, ChronoUnit.HOURS);
+		tempDateTime = tempDateTime.plusHours(hours);
+
+		result += hours;
+
+		long minutes = tempDateTime.until(checkoutTime, ChronoUnit.MINUTES);
+		tempDateTime = tempDateTime.plusMinutes(minutes);
+
+		result += (double) minutes / 60;
+
+		long seconds = tempDateTime.until(checkoutTime, ChronoUnit.SECONDS);
+
+		result += (double) seconds / 3600;
+
+		result = Math.round(result * 100.0) / 100.0;
+		
+		return result;
+	
 	}
 
 }

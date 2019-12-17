@@ -40,26 +40,20 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr>
-									<td class="employee-td"><b>{{typeName}} Room</b></td>
-									<td class="employee-td"> {{unitPrice}}đ</td>
-									<td class="employee-td"> {{timeNumber}}</td>
-									<td class="employee-td"> {{price}}đ</td>
-								</tr>
-								{{#billDetailReport}}
+								{{#billDetailReports}}
 								<tr >
 									<td class="employee-td"><b>{{typeName}}</b></td>
-									<td class="employee-td"> {{unitPrice}}đ</td>
-									<td class="employee-td"> {{numbet}}</td>
-									<td class="employee-td"> {{price}}đ</td>
+									<td class="employee-td"> {{unitPrice}} VND</td>
+									<td class="employee-td"> {{number}}</td>
+									<td class="employee-td"> {{price}} VND</td>
 								</tr>
-								{{/foodReport}}
+								{{/billDetailReports}}
 							</tbody>
 						</table>
 						<hr></hr>
 					</div><br></br>
 					<div style="marginTop:30px'">
-						<h3>PAID: {{totalPrice}}đ</h3>
+						<h3>PAID: {{totalPrice}} VND</h3>
 					</div><br></br>
 					<div style="marginTop:30px'">
 						<div class="row">
