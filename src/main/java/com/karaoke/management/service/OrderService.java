@@ -468,15 +468,11 @@ public class OrderService {
 				buildBillReport.setMetadata(billReportMetaData);
 				String html = buildBillReport.builder();
 				try {
-					// Bước 1: Tạo đối tượng luồng và liên kết nguồn dữ liệu
-					FileOutputStream fos = new FileOutputStream(link + "/bill-report-template.html") ;
-					DataOutputStream dos = new DataOutputStream(fos);
-					// Bước 2: Ghi dữ liệu
-					dos.writeBytes(html);
-					// Bước 3: Đóng luồng
-					fos.close();
-					dos.close();
-					System.out.println("Done!");
+					FileOutputStream fileOutputStream = new FileOutputStream(link + "/bill-report-template.html") ;
+					DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
+					dataOutputStream.writeBytes(html);
+					fileOutputStream.close();
+					dataOutputStream.close();
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				}
