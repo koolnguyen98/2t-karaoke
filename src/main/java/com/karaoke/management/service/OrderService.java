@@ -1,5 +1,8 @@
 package com.karaoke.management.service;
 
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -11,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -58,6 +62,9 @@ public class OrderService {
 
 	@Autowired
 	UserAccountRepository userAccountRepository;
+	
+	@Value("${file.html}")
+	private String link;
 	
 	Logger logger = WriterLog.getLogger(OrderService.class.toString());
 
@@ -460,6 +467,19 @@ public class OrderService {
 				BillReportMetaData billReportMetaData = BuildBillReportMetadata.buildMetadata(room, bill, billDetails, seller);
 				buildBillReport.setMetadata(billReportMetaData);
 				String html = buildBillReport.builder();
+				try {
+					// Bước 1: Tạo đối tượng luồng và liên kết nguồn dữ liệu
+					FileOutputStream fos = new FileOutputStream(link + "/bill-report-template.html") ;
+					DataOutputStream dos = new DataOutputStream(fos);
+					// Bước 2: Ghi dữ liệu
+					dos.writeBytes(html);
+					// Bước 3: Đóng luồng
+					fos.close();
+					dos.close();
+					System.out.println("Done!");
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
 				return ResponseEntity.ok(html);
 			}
 		}
