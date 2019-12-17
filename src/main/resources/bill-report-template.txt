@@ -1,0 +1,81 @@
+{{#metadata}}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Bill Report</title>
+</head>
+<body>
+	<div class="" style="height:100vh; width:100wh'">
+		<form class="row employee-page-leftpane">
+
+			<div class="employee-new col-12">
+				<br></br>
+				<div class="department">
+					<h3>Karaoke 2T</h3>
+					<p>{{startDate}}  - {{endDate}}</p>
+				</div>
+				<div class="receipt" style="textAlign:left; marginLeft:260px'">
+					<div style="marginTop:30px'">
+						<h3>RECEIPT</h3>
+					</div><br></br>
+					<div class="row">
+						<div class="col-3"> <p><b>Room Name: </b>{{roomName}}</p></div>
+						<div class="col-3"> <p><b>Checkin: </b>{{startDate}}</p></div>
+						<div class="col-3"> <p><b>Checkout: </b>{{endDate}}</p></div>
+						<div class="col-3"> <p><b>Guest: </b>Guest</p></div>
+					</div><br></br>
+				</div>
+				<div class="receipt" style="textAlign:left; marginLeft:260px'">
+					<div style="marginTop:30px'">
+						<h3>SERVICE</h3>
+					</div><br></br>
+					<div class="row employee-table">
+						<table class="table-hover table-striped col-10" style="marginLeft:12px'">
+							<thead>
+								<tr role="row">
+									<th class="employee-th">Name</th>
+									<th class="employee-th">Price</th>
+									<th class="employee-th">Amount</th>
+									<th class="employee-th">Total</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td class="employee-td"><b>{{typeName}} Room</b></td>
+									<td class="employee-td"> {{unitPrice}}đ</td>
+									<td class="employee-td"> {{timeNumber}}</td>
+									<td class="employee-td"> {{price}}đ</td>
+								</tr>
+								{{#billDetailReport}}
+								<tr >
+									<td class="employee-td"><b>{{typeName}}</b></td>
+									<td class="employee-td"> {{unitPrice}}đ</td>
+									<td class="employee-td"> {{numbet}}</td>
+									<td class="employee-td"> {{price}}đ</td>
+								</tr>
+								{{/foodReport}}
+							</tbody>
+						</table>
+						<hr></hr>
+					</div><br></br>
+					<div style="marginTop:30px'">
+						<h3>PAID: {{totalPrice}}đ</h3>
+					</div><br></br>
+					<div style="marginTop:30px'">
+						<div class="row">
+							<div class="col-4"> <p><b>Receipt: </b>{{billId}}</p></div>
+							<div class="col-4"> <p><b>Time: </b>{{endDate}}</p></div>
+							<div class="col-4"> <p><b>Seller: </b>{{seller}}</p></div>
+						</div>
+					</div><br></br>
+				</div>
+				<div class="department">
+					<p><b>Helpdesk: </b> 03 12345678</p>
+					<b>Thanks for your coming!</b>
+				</div>
+			</div>
+		</form>
+	</div>
+</body>
+</html>
+{{/metadata}}

@@ -35,6 +35,7 @@ public interface Urls {
 	public final String API_ORDER_ADD_BILL_DETAILS = API_ORDER + "/addbilldetail/{roomId}";
 	public final String API_ORDER_ADD_LIST_BILL_DETAILS = API_ORDER + "/addlistbilldetail/{roomId}";
 	public final String API_ORDER_DELETE_BILL_DETAILS = API_ORDER + "/deletebilldetail/{roomId}";
+	public final String API_ORDER_PRINT_BILL = API_ORDER + "/printbill/{roomId}";
 
 	public final String API_IMPORT_DATABASE = API + "/import";
 	

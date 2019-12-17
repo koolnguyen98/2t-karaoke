@@ -41,4 +41,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	@Query(value = "SELECT * FROM bill WHERE bill.checkout IS NULL", nativeQuery = true)
 	List<Bill> findBillSuccess();
+	
+	@Query(value = "SELECT * FROM bill WHERE bill.room_id = ?1 ORDER BY bill.id DESC LIMIT 1", nativeQuery = true)
+	Bill findBillTop1ByRoomId(int roomId);
 }

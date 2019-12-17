@@ -37,6 +37,9 @@ import com.karaoke.management.reponsitory.BillRepository;
 import com.karaoke.management.reponsitory.FoodRepository;
 import com.karaoke.management.reponsitory.RoomRepository;
 import com.karaoke.management.reponsitory.UserAccountRepository;
+import com.karaoke.management.report.BillReportMetaData;
+import com.karaoke.management.report.BuildBillReport;
+import com.karaoke.management.report.BuildBillReportMetadata;
 
 @Service
 public class OrderService {
@@ -437,6 +440,23 @@ public class OrderService {
 			logger.warning("Client " + request.getRemoteAddr() + ": " + e.toString());
 			return false;
 		}
+	}
+
+	public ResponseEntity<?> printBill(int roomId, Authentication authentication, HttpServletRequest request) {
+		BuildBillReport buildBillReport = new BuildBillReport();
+		
+		Room room = roomRepository.findByRoomId(roomId);
+		
+		Bill bill = billRepository.findBillTop1ByRoomId(roomId);
+		
+		UserAccount userAccount = userAccountRepository.findById(bill.getBillId());
+		
+		List<BillDetails> billDetails = billDetailsRepository.findByBill(bill); 
+		
+		BillReportMetaData billReportMetaData = BuildBillReportMetadata.buildMetadata(room, bill, billDetails, userAccount.getName());
+		buildBillReport.setMetadata(billReportMetaData);
+		String html = buildBillReport.builder();
+		return ResponseEntity.ok(html);
 	}
 
 }

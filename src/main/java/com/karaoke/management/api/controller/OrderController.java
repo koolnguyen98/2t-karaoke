@@ -54,5 +54,9 @@ public class OrderController {
 	public ResponseEntity<?> checkout(@PathVariable int roomId, Authentication authentication, HttpServletRequest request) throws URISyntaxException {
 		return orderService.checkoutRoom(roomId, authentication, request);
 	}	
-
+	
+	@GetMapping(value =  Urls.API_ORDER_PRINT_BILL)
+	public ResponseEntity<?> printBill(@PathVariable int roomId, Authentication authentication, HttpServletRequest request) throws URISyntaxException {
+		return orderService.printBill(roomId, authentication, request);
+	}	
 }
