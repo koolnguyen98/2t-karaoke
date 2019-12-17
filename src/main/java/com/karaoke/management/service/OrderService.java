@@ -447,16 +447,25 @@ public class OrderService {
 		
 		Room room = roomRepository.findByRoomId(roomId);
 		
-		Bill bill = billRepository.findBillTop1ByRoomId(roomId);
+		if(room != null) {
+			if(room.getStatus() == 0) {
+				Bill bill = billRepository.findBillTop1ByRoomId(roomId);
+				
+				UserAccount userAccount = userAccountRepository.findById(bill.getBillId());
+				
+				String seller = userAccount != null ? userAccount.getName() : "";
+				
+				List<BillDetails> billDetails = billDetailsRepository.findByBill(bill); 
+				
+				BillReportMetaData billReportMetaData = BuildBillReportMetadata.buildMetadata(room, bill, billDetails, seller);
+				buildBillReport.setMetadata(billReportMetaData);
+				String html = buildBillReport.builder();
+				return ResponseEntity.ok(html);
+			}
+		}
+		return new ResponseEntity<Object>(new ApiResponse(false, "Room is using!"),
+				HttpStatus.BAD_REQUEST);
 		
-		UserAccount userAccount = userAccountRepository.findById(bill.getBillId());
-		
-		List<BillDetails> billDetails = billDetailsRepository.findByBill(bill); 
-		
-		BillReportMetaData billReportMetaData = BuildBillReportMetadata.buildMetadata(room, bill, billDetails, userAccount.getName());
-		buildBillReport.setMetadata(billReportMetaData);
-		String html = buildBillReport.builder();
-		return ResponseEntity.ok(html);
 	}
 
 }

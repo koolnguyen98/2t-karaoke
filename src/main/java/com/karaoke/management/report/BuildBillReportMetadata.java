@@ -15,7 +15,7 @@ public class BuildBillReportMetadata {
 	public static BillReportMetaData buildMetadata(Room room, Bill bill, List<BillDetails> billDetails, String seller) {
 		BillReportMetaData billReportMetaData = new BillReportMetaData();
 		
-		billReportMetaData.setBillId(String.valueOf(bill.getBillId()));
+		billReportMetaData.setBillId(buildBillId(bill.getBillId()));
 		billReportMetaData.setStartDate(bill.getCheckin().toString());
 		billReportMetaData.setEndDate(bill.getCheckout().toString());
 		billReportMetaData.setTotalPrice(buildUnitPrice((double)bill.getTotal()));
@@ -24,6 +24,10 @@ public class BuildBillReportMetadata {
 		billReportMetaData.setBillDetailReports(builBillDetailReport(room, bill, billDetails));
 		
 		return billReportMetaData;
+	}
+
+	private static String buildBillId(int billId) {
+		return String.format("%08d", billId);
 	}
 
 	private static ArrayList<BillDetailReport> builBillDetailReport(Room room, Bill bill, List<BillDetails> billDetails) {
