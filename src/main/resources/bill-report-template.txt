@@ -69,7 +69,15 @@
 				</div>
 			</div>
 		</form>
+		<button onclick="myFunction()">Print this page</button>
 	</div>
+
+<script>
+function myFunction() {
+  window.print();
+}
+</script>
+
 </body>
 </html>
 {{/metadata}}
